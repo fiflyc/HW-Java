@@ -57,7 +57,7 @@ public class HashTable {
      * @return the string corresponding to the key
      */
     public String get(String key) {
-        return container.get(abs(key.hashCode()) % container.size()).find(key);
+        return container.get(index(key)).find(key);
     }
 
     /**
@@ -66,7 +66,7 @@ public class HashTable {
      */
     public String put(String key, String value) {
         String result = remove(key);
-        container.get(abs(key.hashCode()) % container.size()).add(key, value);
+        container.get(index(key)).add(key, value);
         if (result == null) {
             size++;
         }
@@ -87,7 +87,7 @@ public class HashTable {
             size--;
         }
 
-        return container.get(abs(key.hashCode()) % container.size()).remove(key);
+        return container.get(index(key)).remove(key);
     }
 
     /** Clears the hash table. */
@@ -113,5 +113,10 @@ public class HashTable {
         while (container.size() < size) {
             container.add(new List());
         }
+    }
+
+    /** Finds a correct List in the container for a key. */
+    private int index(String key) {
+        return abs(key.hashCode()) % container.size();
     }
 }
