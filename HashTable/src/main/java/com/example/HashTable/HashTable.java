@@ -103,11 +103,7 @@ public class HashTable {
             container.get(i).clear();
         }
 
-        container = new Vector<List>(DEFAULT_MAX_HASH);
-        for (int i = 0; i < DEFAULT_MAX_HASH; i++) {
-            container.add(new List());
-        }
-
+        container.ensureCapacity(DEFAULT_MAX_HASH);
         size = 0;
     }
 
