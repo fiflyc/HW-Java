@@ -15,6 +15,28 @@ class HashTableTest {
     }
 
     @Test
+    void Put_AddingNullValue_Exception() {
+        try {
+            hashTable.put("first try", null);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+
+        assert false;
+    }
+
+    @Test
+    void Put_AddingNullKey_Exception() {
+        try {
+            hashTable.put(null, "not null");
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+
+        assert false;
+    }
+
+    @Test
     void Size_AfterAddingElements_CorrectValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
