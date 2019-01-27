@@ -83,8 +83,9 @@ public class HashTable {
      * @return the removed string or null if there is nothing removed
      */
     public String remove(String key) {
-        if (contains(key))
+        if (contains(key)) {
             size--;
+        }
 
         return container.get(abs(key.hashCode()) % container.size()).remove(key);
     }
