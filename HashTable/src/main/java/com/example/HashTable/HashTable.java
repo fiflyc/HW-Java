@@ -62,9 +62,16 @@ public class HashTable {
 
     /**
      * Puts the string in the hash table.
+     * @throws IllegalArgumentException if the key or the value has null value
      * @return the string corresponding to the key before putting the new one, null if there is no old ones
      */
     public String put(String key, String value) {
+        if (key == null) {
+            throw new IllegalArgumentException("The HashTable can't store values with a null key.");
+        } else if (value == null) {
+            throw new IllegalArgumentException("The HashTable can't store a null values");
+        }
+
         String result = remove(key);
         container.get(index(key)).add(key, value);
         if (result == null) {
