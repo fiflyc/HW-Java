@@ -5,10 +5,10 @@ public class List {
 
     /** Node of the List. */
     private class Node {
-        public String key;
-        public String value;
-        public Node next;
-        public Node prev;
+        private String key;
+        private String value;
+        private Node next;
+        private Node prev;
     }
 
     /** The head of the List. */
