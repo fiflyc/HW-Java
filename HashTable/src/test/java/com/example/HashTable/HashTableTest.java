@@ -1,111 +1,116 @@
 package com.example.HashTable;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HashTableTest {
 
-    @Test
-    void size() {
-        var hashTable = new HashTable();
+    HashTable hashTable;
 
+    @BeforeEach
+    void initialize() {
+        hashTable = new HashTable();
+    }
+
+    @Test
+    void Size_AfterAddingElements_CorrectValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
         hashTable.put("2019", "pig");
         hashTable.put("2020", "rat");
 
-        assertEquals(hashTable.size(), 4);
+        assertEquals(4, hashTable.size());
+    }
+
+    @Test
+    void Size_AfterRemovingElements_CorrectValue() {
+        hashTable.put("2017", "chicken");
+        hashTable.put("2018", "dog");
+        hashTable.put("2019", "pig");
+        hashTable.put("2020", "rat");
 
         hashTable.remove("2017");
         hashTable.remove("2019");
 
-        assertEquals(hashTable.size(), 2);
-
-        hashTable.put("2022", "tiger");
-        hashTable.put("2024", "dragon");
-
-        assertEquals(hashTable.size(), 4);
-
-        hashTable.clear();
-
-        assertEquals(hashTable.size(), 0);
+        assertEquals(2, hashTable.size());
     }
 
     @Test
-    void contains() {
-        var hashTable = new HashTable();
+    void Size_AfterClearingTable_ZeroValue() {
+        hashTable.put("2017", "chicken");
+        hashTable.put("2018", "dog");
+        hashTable.put("2019", "pig");
+        hashTable.put("2020", "rat");
 
+        hashTable.clear();
+
+        assertEquals(0, hashTable.size());
+    }
+
+    @Test
+    void Contains_AfterAddingElements_FindsAll() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
 
-        assertFalse(hashTable.contains("9/10"));
+        assertTrue(hashTable.contains("sqrt(2)"));
         assertTrue(hashTable.contains("1+i"));
         assertTrue(hashTable.contains("19"));
+    }
+
+    @Test
+    void Contains_AfterRemovingElements_FalseIfRemoved() {
+        hashTable.put("19", "natural");
+        hashTable.put("sqrt(2)", "irrational");
+        hashTable.put("1+i", "complex");
 
         hashTable.remove("19");
 
         assertFalse(hashTable.contains("19"));
+
+        hashTable.remove("1+i");
+
+        assertFalse(hashTable.contains("1+i"));
+
+        hashTable.remove("sqrt(2)");
+
+        assertFalse(hashTable.contains("sqrt(2)"));
     }
 
     @Test
-    void get() {
-        var hashTable = new HashTable();
-
+    void Get_AfterAddingElements_FindsAll() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
 
-        assertNull(hashTable.get("9/10"));
-        assertEquals(hashTable.get("1+i"), "complex");
-        assertEquals(hashTable.get("19"), "natural");
+        assertEquals("irrational", hashTable.get("sqrt(2)"));
+        assertEquals("complex", hashTable.get("1+i"));
+        assertEquals("natural", hashTable.get("19"));
+    }
+
+    @Test
+    void Get_AfterRemovingElements_NullIfRemoved() {
+        hashTable.put("19", "natural");
+        hashTable.put("sqrt(2)", "irrational");
+        hashTable.put("1+i", "complex");
 
         hashTable.remove("19");
 
         assertNull(hashTable.get("19"));
+
+        hashTable.remove("1+i");
+
+        assertNull(hashTable.get("1+i"));
+
+        hashTable.remove("sqrt(2)");
+
+        assertNull(hashTable.get("sqrt(2)"));
     }
 
     @Test
-    void put() {
-        var hashTable = new HashTable();
-
-        hashTable.put("0", "I solemnly swear");
-        hashTable.put("1", "that");
-        hashTable.put("2", "I am up to no good");
-
-        assertEquals(hashTable.get("0"), "I solemnly swear");
-        assertEquals(hashTable.get("1"), "that");
-        assertEquals(hashTable.get("2"), "I am up to no good");
-        assertNull(hashTable.get("The Marauder’s Map"));
-    }
-
-    @Test
-    void remove() {
-        var hashTable = new HashTable();
-
-        hashTable.put("2017", "chicken");
-        hashTable.put("2018", "dog");
-        hashTable.put("2019", "pig");
-        hashTable.put("2020", "rat");
-
-        hashTable.remove("2017");
-        hashTable.remove("2019");
-
-        assertNull(hashTable.get("2017"));
-        assertEquals(hashTable.get("2018"), "dog");
-
-        hashTable.put("2022", "tiger");
-        hashTable.put("2024", "dragon");
-
-        assertNull(hashTable.remove("2019"));
-        assertEquals(hashTable.remove("2020"), "rat");
-    }
-
-    @Test
-    void clear() {
-        var hashTable = new HashTable();
-
+    void Get_AfterClearingTable_ZeroValue() {
         hashTable.put("1", "Out in the distance");
         hashTable.put("2", "There's so much gold");
         hashTable.put("3,", "The treasure that I've found");
