@@ -7,8 +7,10 @@ public class HashTable {
 
     /** The number of keys in the hash table. */
     private int size;
+
     /** Container with pairs (key, value). */
     private List[] container;
+
     /** The default max hash value. */
     private static final int DEFAULT_MAX_HASH = 10000;
 
@@ -28,6 +30,7 @@ public class HashTable {
 
         size = 0;
     }
+
     /**
      * Returns the size of the hash table.
      * @return the number of containing keys
@@ -59,8 +62,9 @@ public class HashTable {
     public String put(String key, String value) {
         String result = remove(key);
         container[abs(key.hashCode()) % container.length].add(key, value);
-        if (result == null)
+        if (result == null) {
             size++;
+        }
 
         return result;
     }
