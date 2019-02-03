@@ -16,12 +16,12 @@ class HashTableTest {
 
     @Test
     void put_AddingNullValue_Exception() {
-        assertThrows(IllegalArgumentException.class, ()->hashTable.put("1", null));
+        assertThrows(IllegalArgumentException.class, () -> hashTable.put("1", null));
     }
 
     @Test
     void put_AddingNullKey_Exception() {
-        assertThrows(IllegalArgumentException.class, ()->hashTable.put(null, "kek"));
+        assertThrows(IllegalArgumentException.class, () -> hashTable.put(null, "kek"));
     }
 
     @Test
@@ -60,6 +60,11 @@ class HashTableTest {
     }
 
     @Test
+    void contains_NullKey_Exception() {
+        assertThrows(IllegalArgumentException.class, () -> hashTable.contains(null));
+    }
+
+    @Test
     void contains_AfterAddingElements_FindsAll() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
@@ -87,6 +92,11 @@ class HashTableTest {
         hashTable.remove("sqrt(2)");
 
         assertFalse(hashTable.contains("sqrt(2)"));
+    }
+
+    @Test
+    void get_NullKey_Exception() {
+        assertThrows(IllegalArgumentException.class, () -> hashTable.get(null));
     }
 
     @Test
@@ -131,5 +141,10 @@ class HashTableTest {
         for (int i = 0; i < 6; i++) {
             assertNull(hashTable.get(Integer.toString(i)));
         }
+    }
+
+    @Test
+    void remove_NullKey_Exception() {
+        assertThrows(IllegalArgumentException.class, () -> hashTable.remove(null));
     }
 }
