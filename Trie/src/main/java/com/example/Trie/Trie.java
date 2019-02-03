@@ -16,16 +16,16 @@ public class Trie implements Serializable {
     /** A node of a trie */
     private class Node {
 
-        /** A HashMap contains references to the next nodes */
+        /** A HashMap contains references to the next nodes. */
         private HashMap<Character, Node> next;
 
         private boolean isTerminal;
     }
 
-    /** A root of a trie */
+    /** A root of a trie. */
     private Node root;
 
-    /** A size of a trie */
+    /** A size of a trie. */
     private int size;
 
     Trie() {
@@ -92,7 +92,7 @@ public class Trie implements Serializable {
     }
 
     /**
-     * Decodes a trie from bites
+     * Decodes a trie from bites.
      * @param in -- InputStream object what gets a code
      * @throws IOException
      * @throws IllegalArgumentException if InputStream object is a null
