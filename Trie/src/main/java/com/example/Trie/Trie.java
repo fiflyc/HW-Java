@@ -22,6 +22,17 @@ public class Trie implements Serializable {
         private boolean isTerminal;
     }
 
+    /** A root of a trie */
+    private Node root;
+
+    /** A size of a trie */
+    private int size;
+
+    Trie() {
+        root = null;
+        size = 0;
+    }
+
     /**
      * Adds string into a trie.
      * @param element -- string added in trie
@@ -88,6 +99,11 @@ public class Trie implements Serializable {
      */
     @Override
     public void deserialize(@NotNull InputStream in) throws IOException {
+
+    }
+
+    /** Executes when a root of a trie is null. */
+    private Node addFirstElement(@NotNull String element) {
 
     }
 }
