@@ -7,37 +7,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HashTableTest {
 
-    HashTable hashTable;
+    private HashTable hashTable;
 
     @BeforeEach
-    void initialize() {
+    void createHashTable() {
         hashTable = new HashTable();
     }
 
     @Test
-    void Put_AddingNullValue_Exception() {
-        try {
-            hashTable.put("first try", null);
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-
-        assert false;
+    void put_AddingNullValue_Exception() {
+        assertThrows(IllegalArgumentException.class, ()->hashTable.put("1", null));
     }
 
     @Test
-    void Put_AddingNullKey_Exception() {
-        try {
-            hashTable.put(null, "not null");
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-
-        assert false;
+    void put_AddingNullKey_Exception() {
+        assertThrows(IllegalArgumentException.class, ()->hashTable.put(null, "kek"));
     }
 
     @Test
-    void Size_AfterAddingElements_CorrectValue() {
+    void size_AfterAddingElements_CorrectValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
         hashTable.put("2019", "pig");
@@ -47,7 +35,7 @@ class HashTableTest {
     }
 
     @Test
-    void Size_AfterRemovingElements_CorrectValue() {
+    void size_AfterRemovingElements_CorrectValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
         hashTable.put("2019", "pig");
@@ -60,7 +48,7 @@ class HashTableTest {
     }
 
     @Test
-    void Size_AfterClearingTable_ZeroValue() {
+    void size_AfterClearingTable_ZeroValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
         hashTable.put("2019", "pig");
@@ -83,7 +71,7 @@ class HashTableTest {
     }
 
     @Test
-    void Contains_AfterRemovingElements_FalseIfRemoved() {
+    void contains_AfterRemovingElements_FalseIfRemoved() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
@@ -102,7 +90,7 @@ class HashTableTest {
     }
 
     @Test
-    void Get_AfterAddingElements_FindsAll() {
+    void get_AfterAddingElements_FindsAll() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
@@ -113,7 +101,7 @@ class HashTableTest {
     }
 
     @Test
-    void Get_AfterRemovingElements_NullIfRemoved() {
+    void get_AfterRemovingElements_NullIfRemoved() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
@@ -132,7 +120,7 @@ class HashTableTest {
     }
 
     @Test
-    void Get_AfterClearingTable_ZeroValue() {
+    void get_AfterClearingTable_ZeroValue() {
         hashTable.put("1", "Out in the distance");
         hashTable.put("2", "There's so much gold");
         hashTable.put("3,", "The treasure that I've found");
