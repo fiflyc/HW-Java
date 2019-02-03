@@ -1,5 +1,6 @@
 package com.example.HashTable;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import static java.lang.Math.abs;
@@ -11,7 +12,7 @@ public class HashTable {
     private int size;
 
     /** Container with pairs (key, value). */
-    private Vector<List> container;
+    private ArrayList<List> container;
 
     /** The default max hash value. */
     private static final int DEFAULT_MAX_HASH = 10000;
@@ -28,7 +29,7 @@ public class HashTable {
             maxHash = DEFAULT_MAX_HASH;
         }
 
-        container = new Vector<List>(maxHash);
+        container = new ArrayList<>(maxHash);
         for (int i = 0; i < maxHash; i++) {
             container.add(new List());
         }
@@ -103,7 +104,11 @@ public class HashTable {
             container.get(i).clear();
         }
 
-        container.ensureCapacity(DEFAULT_MAX_HASH);
+        container = new ArrayList<>(DEFAULT_MAX_HASH);
+        for (int i = 0; i < DEFAULT_MAX_HASH; i++) {
+            container.add(new List());
+        }
+
         size = 0;
     }
 
