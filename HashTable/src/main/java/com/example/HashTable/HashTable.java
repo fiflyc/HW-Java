@@ -1,7 +1,8 @@
 package com.example.HashTable;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
-import java.util.Vector;
 
 import static java.lang.Math.abs;
 
@@ -50,19 +51,16 @@ public class HashTable {
      * @throws IllegalArgumentException if the key has null value
      * @return true if the key is in the hash table
      */
-    public boolean contains(String key) {
-        if (key == null) {
-            throw new IllegalArgumentException("The HashTable doesn't store values with a null key.");
-        }
-
+    public boolean contains(@NotNull String key) {
         return get(key) != null;
     }
 
     /**
      * Returns a string by the key.
+     * @throws IllegalArgumentException if the key has null value
      * @return the string corresponding to the key
      */
-    public String get(String key) {
+    public String get(@NotNull String key) {
         return container.get(index(key)).find(key);
     }
 
@@ -71,13 +69,7 @@ public class HashTable {
      * @throws IllegalArgumentException if the key or the value has null value
      * @return the string corresponding to the key before putting the new one, null if there is no old ones
      */
-    public String put(String key, String value) {
-        if (key == null) {
-            throw new IllegalArgumentException("The HashTable can't store values with a null key.");
-        } else if (value == null) {
-            throw new IllegalArgumentException("The HashTable can't store a null values");
-        }
-
+    public String put(@NotNull String key, @NotNull String value) {
         String result = remove(key);
         container.get(index(key)).add(key, value);
         if (result == null) {
@@ -93,9 +85,10 @@ public class HashTable {
 
     /**
      * Removes a string from the hash table.
+     * @throws IllegalArgumentException if the key has null value
      * @return the removed string or null if there is nothing removed
      */
-    public String remove(String key) {
+    public String remove(@NotNull String key) {
         if (contains(key)) {
             size--;
         }
