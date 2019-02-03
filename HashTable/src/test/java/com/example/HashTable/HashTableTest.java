@@ -60,7 +60,7 @@ class HashTableTest {
     }
 
     @Test
-    void Contains_AfterAddingElements_FindsAll() {
+    void contains_AfterAddingElements_FindsAll() {
         hashTable.put("19", "natural");
         hashTable.put("sqrt(2)", "irrational");
         hashTable.put("1+i", "complex");
