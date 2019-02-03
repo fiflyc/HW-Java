@@ -47,9 +47,14 @@ public class HashTable {
 
     /**
      * Checks an availability of a string by the key.
+     * @throws IllegalArgumentException if the key has null value
      * @return true if the key is in the hash table
      */
     public boolean contains(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("The HashTable doesn't store values with a null key.");
+        }
+
         return get(key) != null;
     }
 
