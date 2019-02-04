@@ -26,7 +26,7 @@ public class Trie implements Serializable {
     }
 
     /** A root of a trie. */
-    private Node root;
+    @Nullable private Node root;
 
     /** A number of containing strings. */
     private int size;
@@ -157,7 +157,6 @@ public class Trie implements Serializable {
 
     /**
      * Returns the number of strings what have a matching prefix.
-     * @param prefix
      * @throws IllegalArgumentException if a prefix is null
      * @return the number of strings starts with a prefix
      */

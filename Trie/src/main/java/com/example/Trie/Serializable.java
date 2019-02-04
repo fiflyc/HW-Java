@@ -10,14 +10,12 @@ interface Serializable {
     /**
      * Code an object into bytes
      * @param out -- OutputStream object what takes coding result
-     * @throws IOException
      */
     void serialize(OutputStream out) throws IOException;
 
     /**
      * Decode an object from bytes
      * @param in -- InputStream object what gets a code
-     * @throws IOException
      */
     void deserialize(InputStream in) throws IOException;
 }
