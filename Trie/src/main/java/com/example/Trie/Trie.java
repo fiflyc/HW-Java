@@ -9,12 +9,12 @@ import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
- * Trie (http://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D0%BE%D1%80).
+ * A Trie (http://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D0%BE%D1%80).
  * Implements interface Serializable.
  * */
 public class Trie implements Serializable {
 
-    /** A node of a trie */
+    /** A node of a trie. */
     private class Node {
 
         /** A HashMap contains references to the next nodes. */
@@ -38,10 +38,10 @@ public class Trie implements Serializable {
     }
 
     /**
-     * Adds string into a trie.
-     * @param element -- string added in trie
+     * Adds a string into a trie.
+     * @param element -- a string added in trie
      * @throws IllegalArgumentException if an element is null
-     * @return true if element wasn't in trie before adding
+     * @return true if an element wasn't in a trie before adding
      */
     public boolean add(@NotNull String element) {
         if (root == null) {
@@ -98,7 +98,7 @@ public class Trie implements Serializable {
 
     /**
      * Removes an element from a trie.
-     * @param element
+     * @param element -- an element going been removed
      * @throws IllegalArgumentException if an element is null
      * @return true if an element was in a trie before removing
      */
@@ -136,7 +136,7 @@ public class Trie implements Serializable {
     }
 
     /**
-     * Returns the number of strings have a matching prefix.
+     * Returns the number of strings what have a matching prefix.
      * @param prefix
      * @throws IllegalArgumentException if a prefix is null
      * @return the number of strings starts with a prefix
@@ -160,9 +160,9 @@ public class Trie implements Serializable {
 
     /**
      * Codes a trie into bites.
-     * @param out -- OutputStream object what takes coding result
+     * @param out -- an OutputStream object what takes coding result
      * @throws IOException
-     * @throws IllegalArgumentException if OutputStream object is a null
+     * @throws IllegalArgumentException if an OutputStream object is a null
      */
     @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
@@ -171,9 +171,9 @@ public class Trie implements Serializable {
 
     /**
      * Decodes a trie from bites.
-     * @param in -- InputStream object what gets a code
+     * @param in -- an InputStream object what gets a code
      * @throws IOException
-     * @throws IllegalArgumentException if InputStream object is a null
+     * @throws IllegalArgumentException if an InputStream object is a null
      */
     @Override
     public void deserialize(@NotNull InputStream in) throws IOException {
