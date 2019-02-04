@@ -3,10 +3,11 @@ package com.example.Trie;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * A Trie (http://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D0%BE%D1%80).
@@ -29,12 +30,16 @@ public class Trie implements Serializable {
     /** A root of a trie. */
     private Node root;
 
-    /** A size of a trie. */
+    /** A number of containing strings. */
     private int size;
+
+    /** A number of containing nodes. */
+    private int treeSize;
 
     Trie() {
         root = null;
         size = 0;
+        treeSize = 0;
     }
 
     /**
@@ -107,18 +112,26 @@ public class Trie implements Serializable {
             return false;
         }
 
+        root.weight--;
+        size--;
+        if (root.weight == 0) {
+            root = null;
+            treeSize = 0;
+            return true;
+        }
+
         Node current = root;
-        current.weight--;
         Node next;
 
-        for (char symb: element.toCharArray()) {
-            next = current.next.get(symb);
+        for (int i = 0; i < element.length(); i++) {
+            next = current.next.get(element.charAt(i));
 
             if (next.weight > 1) {
                 next.weight--;
                 current = next;
             } else {
-                current.next.remove(symb);
+                current.next.remove(element.charAt(i));
+                treeSize -= (element.length() - i + 1);
                 return true;
             }
         }
@@ -166,7 +179,12 @@ public class Trie implements Serializable {
      */
     @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
+        ObjectOutputStream objectOut = new ObjectOutputStream(out);
 
+        objectOut.writeInt(treeSize);
+        objectOut.writeInt(root.hashCode());
+        objectOut.writeInt(root.hashCode());
+        codeSubtree(objectOut, root);
     }
 
     /**
@@ -177,7 +195,40 @@ public class Trie implements Serializable {
      */
     @Override
     public void deserialize(@NotNull InputStream in) throws IOException {
+        ObjectInputStream objectIn = new ObjectInputStream(in);
 
+        HashMap<Integer, Node> nodes = new HashMap<>();
+        size = 0;
+        treeSize = objectIn.readInt();
+        int rootHashCode = objectIn.readInt();;
+
+        for (int i = 0; i < treeSize; i++) {
+            int hashCode = objectIn.readInt();
+            Node node = nodes.get(hashCode);
+            if (node == null) {
+                node = new Node();
+                nodes.put(hashCode, node);
+            }
+
+            node.weight = objectIn.readInt();
+            node.isTerminal = objectIn.readBoolean();
+
+            int mapSize = objectIn.readInt();
+            for (int j = 0; j < mapSize; j++) {
+                char symb = objectIn.readChar();
+                hashCode = objectIn.readInt();
+
+                Node next = nodes.get(hashCode);
+                if (next == null) {
+                    next = new Node();
+                    nodes.put(hashCode, next);
+                }
+
+                node.next.put(symb, next);
+            }
+        }
+
+        root = nodes.get(rootHashCode);
     }
 
     /** Creates a new branch in a trie */
@@ -186,6 +237,7 @@ public class Trie implements Serializable {
         first.next = new HashMap<>();
         first.weight = 1;
         Node prev = first;
+        treeSize++;
 
         if (element != null) {
             for (char symb : element.toCharArray()) {
@@ -195,6 +247,7 @@ public class Trie implements Serializable {
 
                 prev.next.put(symb, node);
                 prev = node;
+                treeSize++;
             }
         }
 
@@ -205,10 +258,20 @@ public class Trie implements Serializable {
     /**
      * Codes a subtree. Used only as a part of serialize.
      * @param node -- a root of subtree
-     * @param nodeCode -- a minimum positive value of a non used node code
-     * @return a minimum positive value of a non used node code after coding
      */
-    private int codeSubtree(@NotNull OutputStream out, Node node, int nodeCode) throws IOException {
+    private void codeSubtree(@NotNull ObjectOutputStream out, @NotNull Node node) throws IOException {
+        out.writeInt(node.hashCode());
+        out.writeInt(node.weight);
+        out.writeBoolean(node.isTerminal);
+        out.writeInt(node.next.size());
 
+        for (Map.Entry entry: node.next.entrySet()) {
+            out.writeChar((Integer) entry.getKey());
+            out.writeInt(entry.hashCode());
+        }
+
+        for (Map.Entry entry: node.next.entrySet()) {
+            codeSubtree(out, (Node) entry.getValue());
+        }
     }
 }
