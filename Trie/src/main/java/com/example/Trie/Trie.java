@@ -181,23 +181,27 @@ public class Trie implements Serializable {
     /**
      * Codes a trie into bites.
      * @param out -- an OutputStream object what takes coding result
-     * @throws IOException
      * @throws IllegalArgumentException if an OutputStream object is a null
      */
     @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
         ObjectOutputStream objectOut = new ObjectOutputStream(out);
 
-        objectOut.writeInt(treeSize);
-        objectOut.writeInt(root.hashCode());
-        objectOut.writeInt(root.hashCode());
-        codeSubtree(objectOut, root);
+        if (root == null) {
+            objectOut.writeInt(0);
+        } else {
+            objectOut.writeInt(treeSize);
+            objectOut.writeInt(size);
+            objectOut.writeInt(root.hashCode());
+            codeSubtree(objectOut, root);
+        }
+
+        objectOut.flush();
     }
 
     /**
      * Decodes a trie from bites.
      * @param in -- an InputStream object what gets a code
-     * @throws IOException
      * @throws IllegalArgumentException if an InputStream object is a null
      */
     @Override
@@ -205,15 +209,21 @@ public class Trie implements Serializable {
         ObjectInputStream objectIn = new ObjectInputStream(in);
 
         HashMap<Integer, Node> nodes = new HashMap<>();
-        size = 0;
         treeSize = objectIn.readInt();
-        int rootHashCode = objectIn.readInt();;
+        if (treeSize == 0) {
+            root = null;
+            size = 0;
+            return;
+        }
+        size = objectIn.readInt();
+        int rootHashCode = objectIn.readInt();
 
         for (int i = 0; i < treeSize; i++) {
             int hashCode = objectIn.readInt();
             Node node = nodes.get(hashCode);
             if (node == null) {
                 node = new Node();
+                node.next = new HashMap<>();
                 nodes.put(hashCode, node);
             }
 
@@ -228,6 +238,7 @@ public class Trie implements Serializable {
                 Node next = nodes.get(hashCode);
                 if (next == null) {
                     next = new Node();
+                    next.next = new HashMap<>();
                     nodes.put(hashCode, next);
                 }
 
@@ -273,8 +284,8 @@ public class Trie implements Serializable {
         out.writeInt(node.next.size());
 
         for (Map.Entry entry: node.next.entrySet()) {
-            out.writeChar((Integer) entry.getKey());
-            out.writeInt(entry.hashCode());
+            out.writeChar((Character) entry.getKey());
+            out.writeInt(entry.getValue().hashCode());
         }
 
         for (Map.Entry entry: node.next.entrySet()) {
