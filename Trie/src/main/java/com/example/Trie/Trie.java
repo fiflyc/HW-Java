@@ -47,34 +47,39 @@ public class Trie implements Serializable {
      * @return true if an element wasn't in a trie before adding
      */
     public boolean add(@NotNull String element) {
+        if (contains(element)) {
+            return false;
+        }
+
+        size++;
         if (root == null) {
             root = createNewBranch(element);
-            size++;
             return true;
         }
 
         Node current = root;
         Node next;
-        boolean result = false;
+        boolean isSubstring = true;
 
         for (int i = 0; i < element.length(); i++) {
             next = current.next.get(element.charAt(i));
+            current.weight++;
 
             if (next != null) {
                 current = next;
             } else {
                 next = createNewBranch(element.substring(i + 1));
                 current.next.put(element.charAt(i), next);
-                result = true;
+                isSubstring = false;
                 break;
             }
         }
 
-        if (result) {
-            size++;
+        if (isSubstring) {
+            current.isTerminal = true;
         }
 
-        return result;
+        return true;
     }
 
     /**
@@ -83,6 +88,10 @@ public class Trie implements Serializable {
      * @return true if an element is in a trie
      */
     public boolean contains(@NotNull String element) {
+        if (root == null) {
+            return false;
+        }
+
         Node current = root;
         Node next;
 
