@@ -27,16 +27,28 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         /** Size of a subtree. */
         private int size;
 
+        /** Parent. */
+        @Nullable private Node parent;
+
         /** Left child. */
         @Nullable private Node left;
 
         /** Right child. */
         @Nullable private Node right;
 
+        /** A node with next in order value. */
+        @Nullable private Node next;
+
+        /** A node with previous in order value. */
+        @Nullable private Node prev;
+
         Node(T value) {
             this.value = value;
+            parent = null;
             left = null;
             right = null;
+            next = null;
+            prev = null;
             height = 1;
             size = 1;
         }
@@ -148,22 +160,30 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     @Override
-    public T lower(@NotNull T t) {
+    public T lower(@NotNull T element) {
         return null;
     }
 
     @Override
-    public T floor(@NotNull T t) {
-        return null;
+    public T floor(@NotNull T element) {
+        if (contains(element)) {
+            return element;
+        } else {
+            return higher(element);
+        }
     }
 
     @Override
-    public T ceiling(@NotNull T t) {
-        return null;
+    public T ceiling(@NotNull T element) {
+        if (contains(element)) {
+            return element;
+        } else {
+            return lower(element);
+        }
     }
 
     @Override
-    public T higher(@NotNull T t) {
+    public T higher(@NotNull T element) {
         return null;
     }
 
@@ -180,9 +200,20 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @param node -- the root of a subtree
      * @return the of a new subtree
      */
-    private Node add(@NotNull Node node, T value) {
+    private Node add(@Nullable Node node, @NotNull T value) {
         if (node == null) {
             node = new Node(value);
+            node.prev = prev(node);
+            node.next = next(node);
+
+            if (node.next != null) {
+                node.next.prev = node;
+            }
+            if (node.prev != null) {
+                node.prev.next = node;
+            }
+
+            return node;
         } else if (compare(node.value, value) > 0) {
             node.left = add(node.left, value);
         } else {
@@ -205,6 +236,13 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         } else if (compare(node.value, value) > 0) {
             node.left = remove(node.left, value);
         } else {
+            if (node.prev != null) {
+                node.prev.next = node.next;
+            }
+            if (node.next != null) {
+                node.next.prev = node.prev;
+            }
+
             if (node.right == null) {
                 node = node.left;
             } else if (node.left == null) {
@@ -253,24 +291,32 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         return node;
     }
 
-    /** Double left rotation. */
+    /** Left rotation. */
     private Node rotateLeft(@NotNull Node node) {
         Node v = node.right;
+        Node p = node.parent;
 
         node.right = v.left;
+        node.parent = v;
         v.left = node;
+        v.parent = p;
+
         update(node);
         update(v);
 
         return v;
     }
 
-    /** Double right rotation. */
+    /** Right rotation. */
     private Node rotateRight(@NotNull Node node) {
         Node v = node.left;
+        Node p = node.parent;
 
         node.left = v.right;
+        node.parent = v;
         v.right = node;
+        v.parent = p;
+
         update(node);
         update(v);
 
@@ -297,5 +343,55 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private void update(@NotNull Node node) {
         node.size = size(node.left) + size(node.right) + 1;
         node.height = Integer.max(height(node.left), height(node.right)) + 1;
+    }
+
+    /** Returns node with next in order value. */
+    private Node next(@NotNull Node node) {
+        Node current = null;
+
+        if (node.right != null) {
+            current = node.right;
+            while (current.left != null) {
+                current = current.left;
+            }
+        } else if (node.parent != null) {
+            current = node;
+            while (current.parent.right == current) {
+                current = current.parent;
+
+                if (current.parent == null) {
+                    current = node;
+                    break;
+                }
+            }
+            current = current.parent;
+        }
+
+        return current;
+    }
+
+    /** Returns node with previous in order value. */
+    private Node prev(@NotNull Node node) {
+        Node current = null;
+
+        if (node.left != null) {
+            current = node.left;
+            while (current.right != null) {
+                current = current.right;
+            }
+        } else if (node.parent != null) {
+            current = node;
+            while (current.parent.left == current) {
+                current = current.parent;
+
+                if (current.parent == null) {
+                    current = node;
+                    break;
+                }
+            }
+            current = current.parent;
+        }
+
+        return current;
     }
 }
