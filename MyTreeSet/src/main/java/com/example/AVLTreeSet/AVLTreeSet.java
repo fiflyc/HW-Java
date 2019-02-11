@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractSet;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * TreeSet, containing AVL tree.
@@ -54,6 +54,85 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
     }
 
+    /** Iterator. */
+    private class Iterator<T> implements java.util.Iterator<T> {
+
+        @NotNull private AVLTreeSet<T> treeSet;
+
+        @Nullable private AVLTreeSet<T>.Node<T> currentNode;
+
+        private boolean isReversed;
+
+        private int treeVersion;
+
+        private Iterator(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
+            if (isReversed) {
+                this.isReversed = !treeSet.isReversed;
+            } else {
+                this.isReversed = treeSet.isReversed;
+            }
+
+            this.treeSet = treeSet;
+            treeVersion = treeSet.version;
+
+            if (this.isReversed) {
+                if (treeSet.root == null) {
+                    currentNode = null;
+                }
+
+                currentNode = treeSet.root;
+                while (currentNode.left != null) {
+                    currentNode = currentNode.left;
+                }
+            } else {
+                if (treeSet.root == null) {
+                    currentNode = null;
+                }
+
+                currentNode = treeSet.root;
+                while (currentNode.right != null) {
+                    currentNode = currentNode.right;
+                }
+            }
+        }
+
+        /**
+         * Returns true if the next element exists.
+         * @throws IllegalStateException if an iterator is invalid
+         */
+        @Override
+        public boolean hasNext() {
+            if (version != treeSet.version) {
+                throw new IllegalStateException();
+            }
+
+            return currentNode != null;
+        }
+
+        /**
+         * Returns the next element in an iteration.
+         * @throws IllegalStateException if an iterator is invalid
+         * @throws NoSuchElementException if an iteration has no elements
+         */
+        @Override
+        public T next() {
+            if (version != treeSet.version) {
+                throw new IllegalStateException();
+            }
+            if (currentNode == null) {
+                throw new NoSuchElementException();
+            }
+
+            T result = currentNode.value;
+            if (isReversed) {
+                currentNode = currentNode.prev;
+            } else {
+                currentNode = currentNode.next;
+            }
+
+            return result;
+        }
+    }
     /** Root of a tree */
     @Nullable private Node<T> root;
 
@@ -66,16 +145,23 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      */
     @Nullable private Comparator<? super T> comparator;
 
+    /** Version of a tree.
+     * Needs for disability iterators.
+     */
+    int version;
+
     public AVLTreeSet() {
         root = null;
         comparator = null;
         isReversed = false;
+        version = 0;
     }
 
     public AVLTreeSet(@NotNull Comparator<? super T> comparator) {
         root = null;
         this.comparator = comparator;
         isReversed = false;
+        version = 0;
     }
 
     private AVLTreeSet(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
@@ -86,6 +172,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         } else {
             this.isReversed = treeSet.isReversed;
         }
+        version = 0;
     }
 
     /**
@@ -151,12 +238,12 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new Iterator<>(this, false);
     }
 
     @Override
     public Iterator<T> descendingIterator() {
-        return null;
+        return new Iterator<>(this, true);
     }
 
     /** Makes a new AVLTreeSet with reversed order of elements without copying data. */
