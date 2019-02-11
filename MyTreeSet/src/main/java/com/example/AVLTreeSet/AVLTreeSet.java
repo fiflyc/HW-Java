@@ -66,13 +66,13 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      */
     @Nullable private Comparator<? super T> comparator;
 
-    AVLTreeSet() {
+    public AVLTreeSet() {
         root = null;
         comparator = null;
         isReversed = false;
     }
 
-    AVLTreeSet(@NotNull Comparator<? super T> comparator) {
+    public AVLTreeSet(@NotNull Comparator<? super T> comparator) {
         root = null;
         this.comparator = comparator;
         isReversed = false;
