@@ -25,6 +25,17 @@ class HashTableTest {
     }
 
     @Test
+    void put_AddingManyElementsForResizingTable_AllElementsSaved() {
+        for (int i = 0; i < 10000; i++) {
+            hashTable.put(String.valueOf(i), "Django Fett");
+        }
+
+        for (int i = 0; i < 10000; i++) {
+            assertTrue(hashTable.contains(String.valueOf(i)));
+        }
+    }
+
+    @Test
     void size_AfterAddingElements_CorrectValue() {
         hashTable.put("2017", "chicken");
         hashTable.put("2018", "dog");
