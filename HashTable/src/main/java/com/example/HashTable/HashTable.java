@@ -3,6 +3,7 @@ package com.example.HashTable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static java.lang.Math.abs;
 
@@ -116,13 +117,32 @@ public class HashTable {
             return;
         }
 
-        while (container.size() < size) {
-            container.add(new List());
+        var newContainer = new ArrayList<List>();
+        for (int i = 0; i < size; i++) {
+            newContainer.add(new List());
         }
+
+        Iterator it = container.iterator();
+        Object[] keys;
+        while (it.hasNext()) {
+            keys = ((List) it.next()).getAllKeys().toArray();
+
+            for (int i = 0; i < keys.length; i++) {
+                var key = (String) keys[i];
+                newContainer.get(index(key, size)).add(key, get(key));
+            }
+        }
+
+        container = newContainer;
     }
 
     /** Finds a correct List in the container for a key. */
     private int index(String key) {
         return abs(key.hashCode()) % container.size();
+    }
+
+    /** Evaluates a correct hash code for a key using size of a container. */
+    private int index(String key, int size) {
+        return abs(key.hashCode()) % size;
     }
 }

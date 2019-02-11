@@ -1,5 +1,7 @@
 package com.example.HashTable;
 
+import java.util.ArrayList;
+
 /** Simple realization of the List, containing pairs (String, String). */
 public class List {
 
@@ -79,5 +81,18 @@ public class List {
     /** Makes the List empty. */
     public void clear() {
         head = null;
+    }
+
+    /** Returns list of all keys in a List. */
+    public ArrayList<String> getAllKeys() {
+        Node current = head;
+        var result = new ArrayList<String>();
+
+        while (current != null) {
+            result.add(current.key);
+            current = current.next;
+        }
+
+        return result;
     }
 }
