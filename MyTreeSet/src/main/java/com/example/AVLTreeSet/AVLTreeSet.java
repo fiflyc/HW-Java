@@ -159,11 +159,13 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         return null;
     }
 
+    /** Makes a new AVLTreeSet with reversed order of elements without copying data. */
     @Override
     public MyTreeSet<T> descendingSet() {
         return new AVLTreeSet<T>(this, true);
     }
 
+    /** Returns the first element by an order. */
     @Override
     public T first() {
         if (root == null) {
@@ -178,6 +180,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         return current.value;
     }
 
+    /** Returns the last element by an order. */
     @Override
     public T last() {
         if (root == null) {
@@ -192,11 +195,19 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         return current.value;
     }
 
+    /**
+     * Returns the greatest element lower than the given one.
+     * @throws IllegalArgumentException if an element is null
+     * */
     @Override
     public T lower(@NotNull T element) {
         return lower(root, element);
     }
 
+    /**
+     * Returns the greatest element lower or equal than the given one.
+     * @throws IllegalArgumentException if an element is null
+     * */
     @Override
     public T floor(@NotNull T element) {
         if (contains(element)) {
@@ -206,6 +217,10 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
     }
 
+    /**
+     * Returns the least element greater or equal than the given one.
+     * @throws IllegalArgumentException if an element is null
+     * */
     @Override
     public T ceiling(@NotNull T element) {
         if (contains(element)) {
@@ -215,11 +230,23 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
     }
 
+    /**
+     * Returns the least element greater than the given one.
+     * @throws IllegalArgumentException if an element is null
+     * */
     @Override
     public T higher(@NotNull T element) {
         return higher(root, element);
     }
 
+    /**
+     * Compares two elements.
+     * Doesn't compile if x and y are incomparable.
+     * @param x first element with type super T
+     * @param y second element with type T
+     * @throws IllegalArgumentException if one of elements is null
+     * @return a result of comparing: positive number if x > y, negative if x < y or zero if x and y are equal
+     */
     private int compare(@NotNull Object x, @NotNull T y) {
         if (comparator != null) {
             return comparator.compare((T) x, y);
@@ -428,6 +455,10 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         return current;
     }
 
+    /**
+     * Returns the greatest element lower than the given one in a subtree.
+     * @param node -- the root of a subtree
+     */
     private T lower(@Nullable Node<T> node, @NotNull T element) {
         if (node == null) {
             return null;
@@ -451,6 +482,10 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
     }
 
+    /**
+     * Returns the least element greater than the given one in a subtree.
+     * @param node -- the root of a subtree
+     */
     private T higher(@Nullable Node<T> node, @NotNull T element) {
         if (node == null) {
             return null;
