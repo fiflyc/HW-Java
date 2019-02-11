@@ -165,7 +165,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public T last() {
-        return null;
+        if (root == null) {
+            return null;
+        }
+
+        Node<T> current = root;
+        while (current.right != null) {
+            current = current.right;
+        }
+
+        return current.value;
     }
 
     @Override
