@@ -136,13 +136,13 @@ public class HashTable {
         container = newContainer;
     }
 
-    /** Finds a correct List in the container for a key. */
+    /** Evaluates a correct hash code for a key using size of a container. */
     private int index(String key) {
         return abs(key.hashCode()) % container.size();
     }
 
-    /** Evaluates a correct hash code for a key using size of a container. */
-    private int index(String key, int size) {
-        return abs(key.hashCode()) % size;
+    /** Evaluates a correct hash code for a key. */
+    private int index(String key, int maxHash) {
+        return abs(key.hashCode()) % maxHash;
     }
 }
