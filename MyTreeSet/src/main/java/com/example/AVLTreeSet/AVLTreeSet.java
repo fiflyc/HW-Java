@@ -63,7 +63,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
         private boolean isReversed;
 
-        private int treeVersion;
+        private int version;
 
         private Iterator(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
             if (isReversed) {
@@ -73,7 +73,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             }
 
             this.treeSet = treeSet;
-            treeVersion = treeSet.version;
+            version = treeSet.version;
 
             if (this.isReversed) {
                 if (treeSet.root == null) {
@@ -148,7 +148,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /** Version of a tree.
      * Needs for disability iterators.
      */
-    int version;
+    private int version;
 
     public AVLTreeSet() {
         root = null;
