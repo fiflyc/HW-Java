@@ -179,7 +179,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public T lower(@NotNull T element) {
-        return null;
+        return lower(root, element);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public T higher(@NotNull T element) {
-        return null;
+        return higher(root, element);
     }
 
     private int compare(@NotNull Object x, @NotNull T y) {
@@ -411,5 +411,51 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
 
         return current;
+    }
+
+    private T lower(@Nullable Node<T> node, @NotNull T element) {
+        if (node == null) {
+            return null;
+        }
+
+        if (compare(node.value, element) == 0) {
+            if (node.prev == null) {
+                return null;
+            } else {
+                return node.prev.value;
+            }
+        } else if (compare(node.value, element) > 0) {
+            return lower(node.left, element);
+        } else {
+            T result = lower(node.right, element);
+            if (result == null) {
+                return node.value;
+            } else {
+                return result;
+            }
+        }
+    }
+
+    private T higher(@Nullable Node<T> node, @NotNull T element) {
+        if (node == null) {
+            return null;
+        }
+
+        if (compare(node.value, element) == 0) {
+            if (node.next == null) {
+                return null;
+            } else {
+                return node.next.value;
+            }
+        } else if (compare(node.value, element) < 0) {
+            return higher(node.right, element);
+        } else {
+            T result = higher(node.left, element);
+            if (result == null) {
+                return node.value;
+            } else {
+                return result;
+            }
+        }
     }
 }
