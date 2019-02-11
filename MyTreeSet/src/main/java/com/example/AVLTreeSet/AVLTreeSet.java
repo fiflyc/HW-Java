@@ -28,21 +28,21 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         private int size;
 
         /** Parent. */
-        @Nullable private Node parent;
+        @Nullable private Node<T> parent;
 
         /** Left child. */
-        @Nullable private Node left;
+        @Nullable private Node<T> left;
 
         /** Right child. */
-        @Nullable private Node right;
+        @Nullable private Node<T> right;
 
         /** A node with next in order value. */
-        @Nullable private Node next;
+        @Nullable private Node<T> next;
 
         /** A node with previous in order value. */
-        @Nullable private Node prev;
+        @Nullable private Node<T> prev;
 
-        Node(T value) {
+        Node(@NotNull T value) {
             this.value = value;
             parent = null;
             left = null;
@@ -55,7 +55,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Root of a tree */
-    @Nullable private Node root;
+    @Nullable private Node<T> root;
 
     /**
      * Compares elements.
@@ -151,7 +151,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public T first() {
-        return null;
+        if (root == null) {
+            return null;
+        }
+
+        Node<T> current = root;
+        while (current.left != null) {
+            current = current.left;
+        }
+
+        return current.value;
     }
 
     @Override
@@ -200,9 +209,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @param node -- the root of a subtree
      * @return the of a new subtree
      */
-    private Node add(@Nullable Node node, @NotNull T value) {
+    private Node<T> add(@Nullable Node<T> node, @NotNull T value) {
         if (node == null) {
-            node = new Node(value);
+            node = new Node<T>(value);
             node.prev = prev(node);
             node.next = next(node);
 
@@ -217,7 +226,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         } else if (compare(node.value, value) > 0) {
             node.left = add(node.left, value);
         } else {
-            node.right = add(root.right, value);
+            node.right = add(node.right, value);
         }
 
         update(node);
@@ -230,7 +239,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @param node -- the root of a subtree
      * @return the root of a new subtree
      */
-    private Node remove(@NotNull Node node, T value) {
+    private Node<T> remove(@NotNull Node<T> node, @NotNull T value) {
         if (compare(node.value, value) < 0) {
             node.right = remove(node.right, value);
         } else if (compare(node.value, value) > 0) {
@@ -267,7 +276,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Balances a tree. */
-    private Node balance(@Nullable Node node) {
+    private Node<T> balance(@Nullable Node<T> node) {
         if (node == null) {
             return null;
         }
@@ -292,9 +301,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Left rotation. */
-    private Node rotateLeft(@NotNull Node node) {
-        Node v = node.right;
-        Node p = node.parent;
+    private Node<T> rotateLeft(@NotNull Node<T> node) {
+        Node<T> v = node.right;
+        Node<T> p = node.parent;
 
         node.right = v.left;
         node.parent = v;
@@ -308,9 +317,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Right rotation. */
-    private Node rotateRight(@NotNull Node node) {
-        Node v = node.left;
-        Node p = node.parent;
+    private Node<T> rotateRight(@NotNull Node<T> node) {
+        Node<T> v = node.left;
+        Node<T> p = node.parent;
 
         node.left = v.right;
         node.parent = v;
@@ -324,7 +333,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns height of a node in a tree or 0 if node is null. */
-    private int height(@Nullable Node node) {
+    private int height(@Nullable Node<T> node) {
         if (node == null) {
             return 0;
         }
@@ -332,7 +341,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns size of a node in a tree or 0 if node is null. */
-    private int size(@Nullable Node node) {
+    private int size(@Nullable Node<T> node) {
         if (node == null) {
             return 0;
         }
@@ -346,8 +355,8 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns node with next in order value. */
-    private Node next(@NotNull Node node) {
-        Node current = null;
+    private Node<T> next(@NotNull Node<T> node) {
+        Node<T> current = null;
 
         if (node.right != null) {
             current = node.right;
@@ -371,7 +380,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns node with previous in order value. */
-    private Node prev(@NotNull Node node) {
+    private Node<T> prev(@NotNull Node<T> node) {
         Node current = null;
 
         if (node.left != null) {
