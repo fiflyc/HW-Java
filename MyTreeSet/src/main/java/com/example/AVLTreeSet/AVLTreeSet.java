@@ -57,6 +57,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /** Root of a tree */
     @Nullable private Node<T> root;
 
+    /** An order of elements. */
+    boolean isReversed;
+
     /**
      * Compares elements.
      * If type T or his parent does not implement Comparable<>, AVLTreeSet will no work.
@@ -66,11 +69,23 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     AVLTreeSet() {
         root = null;
         comparator = null;
+        isReversed = false;
     }
 
     AVLTreeSet(@NotNull Comparator<? super T> comparator) {
         root = null;
         this.comparator = comparator;
+        isReversed = false;
+    }
+
+    private AVLTreeSet(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
+        root = treeSet.root;
+        comparator = treeSet.comparator;
+        if (isReversed) {
+            this.isReversed = !treeSet.isReversed;
+        } else {
+            this.isReversed = treeSet.isReversed;
+        }
     }
 
     /**
@@ -146,7 +161,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     @Override
     public MyTreeSet<T> descendingSet() {
-        return null;
+        return new AVLTreeSet<T>(this, true);
     }
 
     @Override
