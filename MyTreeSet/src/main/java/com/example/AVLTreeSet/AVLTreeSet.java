@@ -66,35 +66,14 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         private int version;
 
         private Iterator(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
-            if (isReversed) {
-                this.isReversed = !treeSet.isReversed;
-            } else {
-                this.isReversed = treeSet.isReversed;
-            }
-
+            this.isReversed = isReversed;
             this.treeSet = treeSet;
             version = treeSet.version;
 
             if (this.isReversed) {
-                if (treeSet.root == null) {
-                    currentNode = null;
-                    return;
-                }
-
-                currentNode = treeSet.root;
-                while (currentNode.right != null) {
-                    currentNode = currentNode.right;
-                }
+                currentNode = treeSet.lastNode();
             } else {
-                if (treeSet.root == null) {
-                    currentNode = null;
-                    return;
-                }
-
-                currentNode = treeSet.root;
-                while (currentNode.left != null) {
-                    currentNode = currentNode.left;
-                }
+                currentNode = treeSet.firstNode();
             }
         }
 
@@ -126,7 +105,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             }
 
             T result = currentNode.value;
-            if (isReversed) {
+            if (isReversed ^ treeSet.isReversed) {
                 currentNode = currentNode.prev;
             } else {
                 currentNode = currentNode.next;
@@ -190,16 +169,6 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
         root = add(root, element);
 
-        Node<T> addedNode = find(element);
-        addedNode.next = next(addedNode);
-        if (addedNode.next != null) {
-            addedNode.next.prev = addedNode;
-        }
-        addedNode.prev = prev(addedNode);
-        if (addedNode.prev != null) {
-            addedNode.prev.next = addedNode;
-        }
-
         return false;
     }
 
@@ -225,29 +194,13 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @return true if an element in a container
      */
     public boolean contains(@NotNull Object element) {
-        Node current = root;
-
-        while (current != null) {
-            if (compare(element, (T) current.value) < 0) {
-                current = current.left;
-            } else if (compare(element, (T) current.value) > 0) {
-                current = current.right;
-            } else {
-                return true;
-            }
-        }
-
-        return false;
+        return find((T) element) != null;
     }
 
     /** Returns number of elements in container. */
     @Override
     public int size() {
-        if (root == null) {
-            return 0;
-        }
-
-        return root.size;
+        return size(root);
     }
 
     @Override
@@ -269,44 +222,23 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /** Returns the first element by an order. */
     @Override
     public T first() {
-        if (root == null) {
+        var result = firstNode();
+        if (result != null) {
+            return result.value;
+        } else {
             return null;
         }
-
-        Node<T> current = root;
-        if (isReversed) {
-            while (current.right != null) {
-                current = current.right;
-            }
-        } else {
-            while (current.left != null) {
-                current = current.left;
-            }
-        }
-
-        return current.value;
     }
 
     /** Returns the last element by an order. */
     @Override
     public T last() {
-        if (root == null) {
+        var result = lastNode();
+        if (result != null) {
+            return result.value;
+        } else {
             return null;
         }
-
-        Node<T> current = root;
-        if (!isReversed) {
-            while (current.right != null) {
-                current = current.right;
-            }
-        } else {
-            while (current.left != null) {
-                current = current.left;
-            }
-        }
-
-
-        return current.value;
     }
 
     /**
@@ -315,7 +247,12 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * */
     @Override
     public T lower(@NotNull T element) {
-        return lower(root, element);
+        var result = lower(root, element);
+        if (result != null) {
+            return result.value;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -350,7 +287,12 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * */
     @Override
     public T higher(@NotNull T element) {
-        return higher(root, element);
+        var result = higher(root, element);
+        if (result != null) {
+            return result.value;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -377,6 +319,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private Node<T> add(@Nullable Node<T> node, @NotNull T value) {
         if (node == null) {
             node = new Node<T>(value);
+
+            node.prev = lower(root, value);
+            if (node.prev != null) {
+                node.prev.next = node;
+            }
+            node.next = higher(root, value);
+            if (node.next != null) {
+                node.next.prev = node;
+            }
+
             return node;
         } else if (compare(node.value, value) > 0) {
             node.left = add(node.left, value);
@@ -521,75 +473,23 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         node.height = Integer.max(height(node.left), height(node.right)) + 1;
     }
 
-    /** Returns node with next in order value. */
-    private Node<T> next(@NotNull Node<T> node) {
-        Node<T> current = null;
-
-        if (node.right != null) {
-            current = node.right;
-            while (current.left != null) {
-                current = current.left;
-            }
-        } else if (node.parent != null) {
-            current = node;
-            while (current.parent.right == current) {
-                current = current.parent;
-
-                if (current.parent == null) {
-                    return null;
-                }
-            }
-            current = current.parent;
-        }
-
-        return current;
-    }
-
-    /** Returns node with previous in order value. */
-    private Node<T> prev(@NotNull Node<T> node) {
-        Node<T> current = null;
-
-        if (node.left != null) {
-            current = node.left;
-            while (current.right != null) {
-                current = current.right;
-            }
-        } else if (node.parent != null) {
-            current = node;
-            while (current.parent.left == current) {
-                current = current.parent;
-
-                if (current.parent == null) {
-                    return null;
-                }
-            }
-            current = current.parent;
-        }
-
-        return current;
-    }
-
     /**
      * Returns the greatest element lower than the given one in a subtree.
      * @param node -- the root of a subtree
      */
-    private T lower(@Nullable Node<T> node, @NotNull T element) {
+    private Node<T> lower(@Nullable Node<T> node, @NotNull T element) {
         if (node == null) {
             return null;
         }
 
         if (compare(node.value, element) == 0) {
-            if (node.prev == null) {
-                return null;
-            } else {
-                return node.prev.value;
-            }
+            return node.prev;
         } else if (compare(node.value, element) > 0) {
             return lower(node.left, element);
         } else {
-            T result = lower(node.right, element);
+            Node<T> result = lower(node.right, element);
             if (result == null) {
-                return node.value;
+                return node;
             } else {
                 return result;
             }
@@ -600,23 +500,19 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * Returns the least element greater than the given one in a subtree.
      * @param node -- the root of a subtree
      */
-    private T higher(@Nullable Node<T> node, @NotNull T element) {
+    private Node<T> higher(@Nullable Node<T> node, @NotNull T element) {
         if (node == null) {
             return null;
         }
 
         if (compare(node.value, element) == 0) {
-            if (node.next == null) {
-                return null;
-            } else {
-                return node.next.value;
-            }
+            return node.next;
         } else if (compare(node.value, element) < 0) {
             return higher(node.right, element);
         } else {
-            T result = higher(node.left, element);
+            Node<T> result = higher(node.left, element);
             if (result == null) {
-                return node.value;
+                return node;
             } else {
                 return result;
             }
@@ -638,5 +534,46 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
 
         return null;
+    }
+
+    /** Returns a node with the first element by an order. */
+    private Node<T> firstNode() {
+        if (root == null) {
+            return null;
+        }
+
+        Node<T> current = root;
+        if (isReversed) {
+            while (current.right != null) {
+                current = current.right;
+            }
+        } else {
+            while (current.left != null) {
+                current = current.left;
+            }
+        }
+
+        return current;
+    }
+
+    /** Returns a node with the last element by an order. */
+    private Node<T> lastNode() {
+        if (root == null) {
+            return null;
+        }
+
+        Node<T> current = root;
+        if (isReversed) {
+            while (current.left != null) {
+                current = current.left;
+            }
+        } else {
+            while (current.right != null) {
+                current = current.right;
+            }
+        }
+
+
+        return current;
     }
 }
