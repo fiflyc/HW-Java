@@ -114,7 +114,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     @Nullable private Node<T> root;
 
     /** An order of elements. */
-    boolean isReversed;
+    private boolean isReversed;
 
     /**
      * Compares elements.
@@ -409,7 +409,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     /** Left rotation. */
     private Node<T> rotateLeft(@NotNull Node<T> node) {
-        Node<T> v = node.right;
+        var v = node.right;
 
         node.right = v.left;
         v.left = node;
@@ -421,7 +421,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     /** Right rotation. */
     private Node<T> rotateRight(@NotNull Node<T> node) {
-        Node<T> v = node.left;
+        var v = node.left;
 
         node.left = v.right;
         v.right = node;
@@ -467,7 +467,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         } else if (compare(node.value, element) > 0) {
             return lower(node.left, element);
         } else {
-            Node<T> result = lower(node.right, element);
+            var result = lower(node.right, element);
             if (result == null) {
                 return node;
             } else {
@@ -522,7 +522,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             return null;
         }
 
-        Node<T> current = root;
+        var current = root;
         if (isReversed) {
             while (current.right != null) {
                 current = current.right;
@@ -542,7 +542,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             return null;
         }
 
-        Node<T> current = root;
+        var current = root;
         if (isReversed) {
             while (current.left != null) {
                 current = current.left;

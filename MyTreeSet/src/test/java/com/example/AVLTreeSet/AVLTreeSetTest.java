@@ -23,12 +23,12 @@ class AVLTreeSetTest {
             treeSet.add(i);
         }
 
-        Iterator it = treeSet.iterator();
+        Iterator iterator = treeSet.iterator();
         for (int i = 0; i < 10; i++) {
-            assertTrue(it.hasNext());
-            assertEquals(i, it.next());
+            assertTrue(iterator.hasNext());
+            assertEquals(i, iterator.next());
         }
-        assertFalse(it.hasNext());
+        assertFalse(iterator.hasNext());
     }
 
     @Test
@@ -37,41 +37,41 @@ class AVLTreeSetTest {
             treeSet.add(i);
         }
 
-        Iterator it = treeSet.descendingSet().iterator();
+        Iterator iterator = treeSet.descendingSet().iterator();
         for (int i = 9; i >= 0; i--) {
-            assertTrue(it.hasNext());
-            assertEquals(i, it.next());
+            assertTrue(iterator.hasNext());
+            assertEquals(i, iterator.next());
         }
-        assertFalse(it.hasNext());
+        assertFalse(iterator.hasNext());
     }
 
     @Test
     void iteratorHasNext_EndOfIteration_NoSuchElementExpression() {
         treeSet.add(1);
-        Iterator it = treeSet.iterator();
-        it.next();
+        Iterator iterator = treeSet.iterator();
+        iterator.next();
 
-        assertThrows(NoSuchElementException.class, it::next);
+        assertThrows(NoSuchElementException.class, iterator::next);
     }
 
     @Test
     void iterator_AddElementInTreeSet_IteratorDisabled() {
         treeSet.add(0);
-        Iterator it = treeSet.iterator();
+        Iterator iterator = treeSet.iterator();
         treeSet.add(1);
 
-        assertThrows(IllegalStateException.class, it::next);
-        assertThrows(IllegalStateException.class, it::hasNext);
+        assertThrows(IllegalStateException.class, iterator::next);
+        assertThrows(IllegalStateException.class, iterator::hasNext);
     }
 
     @Test
     void iterator_RemoveElementFromTreeSet_IteratorDisabled() {
         treeSet.add(0);
-        Iterator it = treeSet.iterator();
+        Iterator iterator = treeSet.iterator();
         treeSet.remove(0);
 
-        assertThrows(IllegalStateException.class, it::next);
-        assertThrows(IllegalStateException.class, it::hasNext);
+        assertThrows(IllegalStateException.class, iterator::next);
+        assertThrows(IllegalStateException.class, iterator::hasNext);
     }
 
     @Test
@@ -80,12 +80,12 @@ class AVLTreeSetTest {
             treeSet.add(i);
         }
 
-        Iterator it = treeSet.descendingIterator();
+        Iterator iterator = treeSet.descendingIterator();
         for (int i = 9; i >= 0; i--) {
-            assertTrue(it.hasNext());
-            assertEquals(i, it.next());
+            assertTrue(iterator.hasNext());
+            assertEquals(i, iterator.next());
         }
-        assertFalse(it.hasNext());
+        assertFalse(iterator.hasNext());
     }
 
     @Test
