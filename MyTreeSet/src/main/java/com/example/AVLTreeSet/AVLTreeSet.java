@@ -274,8 +274,14 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
 
         Node<T> current = root;
-        while (current.left != null) {
-            current = current.left;
+        if (isReversed) {
+            while (current.right != null) {
+                current = current.right;
+            }
+        } else {
+            while (current.left != null) {
+                current = current.left;
+            }
         }
 
         return current.value;
@@ -289,9 +295,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
 
         Node<T> current = root;
-        while (current.right != null) {
-            current = current.right;
+        if (!isReversed) {
+            while (current.right != null) {
+                current = current.right;
+            }
+        } else {
+            while (current.left != null) {
+                current = current.left;
+            }
         }
+
 
         return current.value;
     }
