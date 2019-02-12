@@ -189,6 +189,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
         root = add(root, element);
 
+        Node<T> addedNode = find(element);
+        addedNode.next = next(addedNode);
+        if (addedNode.next != null) {
+            addedNode.next.prev = addedNode;
+        }
+        addedNode.prev = prev(addedNode);
+        if (addedNode.prev != null) {
+            addedNode.prev.next = addedNode;
+        }
+
         return false;
     }
 
@@ -352,15 +362,6 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private Node<T> add(@Nullable Node<T> node, @NotNull T value) {
         if (node == null) {
             node = new Node<T>(value);
-            node.prev = prev(node);
-            node.next = next(node);
-
-            if (node.next != null) {
-                node.next.prev = node;
-            }
-            if (node.prev != null) {
-                node.prev.next = node;
-            }
 
             return node;
         } else if (compare(node.value, value) > 0) {
@@ -594,5 +595,22 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
                 return result;
             }
         }
+    }
+
+    /** Finds a node contains matching value. */
+    private Node<T> find(@NotNull T value) {
+        Node<T> current = root;
+
+        while (current != null) {
+            if (compare(value, current.value) < 0) {
+                current = current.left;
+            } else if (compare(value, current.value) > 0) {
+                current = current.right;
+            } else {
+                return current;
+            }
+        }
+
+        return null;
     }
 }
