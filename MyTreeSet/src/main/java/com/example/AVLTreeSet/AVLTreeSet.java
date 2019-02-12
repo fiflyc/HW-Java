@@ -186,6 +186,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         if (contains(element)) {
             return false;
         }
+        version++;
 
         root = add(root, element);
 
@@ -211,6 +212,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         if (!contains(element)) {
             return false;
         }
+        version++;
 
         root = remove(root, (T) element);
 
@@ -362,7 +364,6 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private Node<T> add(@Nullable Node<T> node, @NotNull T value) {
         if (node == null) {
             node = new Node<T>(value);
-
             return node;
         } else if (compare(node.value, value) > 0) {
             node.left = add(node.left, value);
@@ -385,8 +386,14 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private Node<T> remove(@NotNull Node<T> node, @NotNull T value) {
         if (compare(node.value, value) < 0) {
             node.right = remove(node.right, value);
+            if (node.right != null) {
+                node.right.parent = node;
+            }
         } else if (compare(node.value, value) > 0) {
             node.left = remove(node.left, value);
+            if (node.left != null) {
+                node.left.parent = node;
+            }
         } else {
             if (node.prev != null) {
                 node.prev.next = node.next;
@@ -411,6 +418,10 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
                 node.right = remove(node.right, value);
             }
+        }
+
+        if (node == null) {
+            return null;
         }
 
         update(node);
