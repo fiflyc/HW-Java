@@ -509,8 +509,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
                 current = current.parent;
 
                 if (current.parent == null) {
-                    current = node;
-                    break;
+                    return null;
                 }
             }
             current = current.parent;
@@ -521,7 +520,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     /** Returns node with previous in order value. */
     private Node<T> prev(@NotNull Node<T> node) {
-        Node current = null;
+        Node<T> current = null;
 
         if (node.left != null) {
             current = node.left;
@@ -534,8 +533,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
                 current = current.parent;
 
                 if (current.parent == null) {
-                    current = node;
-                    break;
+                    return null;
                 }
             }
             current = current.parent;
