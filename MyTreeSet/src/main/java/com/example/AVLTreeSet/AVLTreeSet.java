@@ -27,9 +27,6 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         /** Size of a subtree. */
         private int size;
 
-        /** Parent. */
-        @Nullable private Node<T> parent;
-
         /** Left child. */
         @Nullable private Node<T> left;
 
@@ -44,7 +41,6 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
         Node(@NotNull T value) {
             this.value = value;
-            parent = null;
             left = null;
             right = null;
             next = null;
@@ -332,10 +328,8 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             return node;
         } else if (compare(node.value, value) > 0) {
             node.left = add(node.left, value);
-            node.left.parent = node;
         } else {
             node.right = add(node.right, value);
-            node.right.parent = node;
         }
 
         update(node);
@@ -351,14 +345,8 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     private Node<T> remove(@NotNull Node<T> node, @NotNull T value) {
         if (compare(node.value, value) < 0) {
             node.right = remove(node.right, value);
-            if (node.right != null) {
-                node.right.parent = node;
-            }
         } else if (compare(node.value, value) > 0) {
             node.left = remove(node.left, value);
-            if (node.left != null) {
-                node.left.parent = node;
-            }
         } else {
             if (node.prev != null) {
                 node.prev.next = node.next;
@@ -422,13 +410,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /** Left rotation. */
     private Node<T> rotateLeft(@NotNull Node<T> node) {
         Node<T> v = node.right;
-        Node<T> p = node.parent;
 
         node.right = v.left;
-        node.parent = v;
         v.left = node;
-        v.parent = p;
-
         update(node);
         update(v);
 
@@ -438,13 +422,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /** Right rotation. */
     private Node<T> rotateRight(@NotNull Node<T> node) {
         Node<T> v = node.left;
-        Node<T> p = node.parent;
 
         node.left = v.right;
-        node.parent = v;
         v.right = node;
-        v.parent = p;
-
         update(node);
         update(v);
 
