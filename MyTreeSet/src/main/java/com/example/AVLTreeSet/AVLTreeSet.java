@@ -626,39 +626,4 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
         return null;
     }
-
-    public void show() {
-        show(root);
-    }
-
-    private void show(Node<T> node) {
-        if (node == null) {
-            return;
-        }
-
-        System.out.print("(" + node.value.toString() + "|");
-        if (node.left != null) {
-            System.out.print(node.left.value.toString() + ",");
-        } else {
-            System.out.print("n,");
-        }
-        if (node.right != null) {
-            System.out.print(node.right.value.toString() + "|");
-        } else {
-            System.out.print("n|");
-        }
-        if (node.prev != null) {
-            System.out.print(node.prev.value.toString() + ",");
-        } else {
-            System.out.print("n,");
-        }
-        if (node.next != null) {
-            System.out.print(node.next.value.toString() + ")");
-        } else {
-            System.out.print("n)");
-        }
-
-        show(node.left);
-        show(node.right);
-    }
 }
