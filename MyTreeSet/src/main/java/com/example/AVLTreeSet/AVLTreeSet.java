@@ -78,6 +78,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             if (this.isReversed) {
                 if (treeSet.root == null) {
                     currentNode = null;
+                    return;
                 }
 
                 currentNode = treeSet.root;
@@ -87,6 +88,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             } else {
                 if (treeSet.root == null) {
                     currentNode = null;
+                    return;
                 }
 
                 currentNode = treeSet.root;
