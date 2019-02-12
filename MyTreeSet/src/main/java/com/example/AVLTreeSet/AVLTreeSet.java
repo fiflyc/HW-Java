@@ -327,7 +327,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         if (contains(element)) {
             return element;
         } else {
-            return higher(element);
+            return lower(element);
         }
     }
 
@@ -340,7 +340,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         if (contains(element)) {
             return element;
         } else {
-            return lower(element);
+            return higher(element);
         }
     }
 
