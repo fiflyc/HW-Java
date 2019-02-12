@@ -187,7 +187,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             return false;
         }
 
-        add(root, element);
+        root = add(root, element);
 
         return false;
     }
@@ -202,7 +202,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             return false;
         }
 
-        remove(root, (T) element);
+        root = remove(root, (T) element);
 
         return false;
     }
