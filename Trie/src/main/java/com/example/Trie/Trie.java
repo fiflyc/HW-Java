@@ -42,7 +42,7 @@ public class Trie implements Serializable {
 
     /**
      * Adds a string into a trie.
-     * @param element -- a string added in trie
+     * @param element a string added in trie
      * @throws IllegalArgumentException if an element is null
      * @return true if an element wasn't in a trie before adding
      */
@@ -110,7 +110,7 @@ public class Trie implements Serializable {
 
     /**
      * Removes an element from a trie.
-     * @param element -- an element going been removed
+     * @param element an element going been removed
      * @throws IllegalArgumentException if an element is null
      * @return true if an element was in a trie before removing
      */
@@ -179,7 +179,7 @@ public class Trie implements Serializable {
 
     /**
      * Codes a trie into bites.
-     * @param out -- an OutputStream object what takes coding result
+     * @param out an OutputStream object what takes coding result
      * @throws IllegalArgumentException if an OutputStream object is a null
      */
     @Override
@@ -200,7 +200,7 @@ public class Trie implements Serializable {
 
     /**
      * Decodes a trie from bites.
-     * @param in -- an InputStream object what gets a code
+     * @param in an InputStream object what gets a code
      * @throws IllegalArgumentException if an InputStream object is a null
      */
     @Override
@@ -274,7 +274,7 @@ public class Trie implements Serializable {
 
     /**
      * Codes a subtree. Used only as a part of serialize.
-     * @param node -- a root of subtree
+     * @param node a root of subtree
      */
     private void codeSubtree(@NotNull ObjectOutputStream out, @NotNull Node node) throws IOException {
         out.writeInt(node.hashCode());
