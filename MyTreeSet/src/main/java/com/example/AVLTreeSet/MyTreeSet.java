@@ -1,4 +1,4 @@
-package com.example.MyTreeSet;
+package com.example.AVLTreeSet;
 
 import java.util.Iterator;
 import java.util.Set;

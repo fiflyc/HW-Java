@@ -1,6 +1,5 @@
 package com.example.AVLTreeSet;
 
-import com.example.MyTreeSet.MyTreeSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
