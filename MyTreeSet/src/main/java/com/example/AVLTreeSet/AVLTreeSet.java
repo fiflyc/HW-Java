@@ -67,7 +67,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     /** Iterator. */
-    private class Iterator<E> implements java.util.Iterator<E> {
+    private class Iterator implements java.util.Iterator<E> {
 
         @NotNull private AVLTreeSet<E> treeSet;
 
@@ -211,13 +211,13 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
-        return new Iterator<>(this, false);
+    public Iterator iterator() {
+        return new Iterator(this, false);
     }
 
     @Override
-    public Iterator<E> descendingIterator() {
-        return new Iterator<>(this, true);
+    public Iterator descendingIterator() {
+        return new Iterator(this, true);
     }
 
     /** Makes a new AVLTreeSet with reversed order of elements without copying data. */
