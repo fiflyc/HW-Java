@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** Node of a tree. */
-    private class Node<E> {
+    private static class Node<E> {
 
         /** A value in a node. */
         @NotNull private E value;
@@ -71,7 +71,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         @NotNull private AVLTreeSet<E> treeSet;
 
-        @Nullable private AVLTreeSet<E>.Node<E> currentNode;
+        @Nullable private AVLTreeSet.Node<E> currentNode;
 
         private boolean isReversed;
 
