@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 /**
  * TreeSet, containing AVL tree.
  * Implements interface MyTreeSet.
- * @param <E> -- type of elements in TreeSet
+ * @param <E> type of elements in TreeSet
  */
 public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
@@ -115,14 +115,11 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** An order of elements. */
     private boolean isReversed;
 
-    /**
-     * Compares elements.
-     * If type E or his parent does not implement Comparable<>, AVLTreeSet will no work.
-     */
+    /** Compares elements. */
     @Nullable private Comparator<? super E> comparator;
 
     /** Version of a tree.
-     * Needs for disability iterators.
+     * Needed for iterator invalidation.
      */
     private int version;
 
@@ -306,7 +303,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /**
      * Adds a value into a subtree.
-     * @param node -- the root of a subtree
+     * @param node the root of a subtree
      * @return the of a new subtree
      */
     private Node<E> add(@Nullable Node<E> node, @NotNull E value) {
@@ -336,7 +333,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /**
      * Removes a value from a subtree.
-     * @param node -- the root of a subtree
+     * @param node the root of a subtree
      * @return the root of a new subtree
      */
     private Node<E> remove(@NotNull Node<E> node, @NotNull E value) {
@@ -452,7 +449,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /**
      * Returns the greatest element lower than the given one in a subtree.
-     * @param node -- the root of a subtree
+     * @param node the root of a subtree
      */
     private Node<E> lower(@Nullable Node<E> node, @NotNull E element) {
         if (node == null) {
