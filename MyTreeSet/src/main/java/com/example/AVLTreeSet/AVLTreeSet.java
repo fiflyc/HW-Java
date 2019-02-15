@@ -47,6 +47,22 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             height = 1;
             size = 1;
         }
+
+        /** Updates size and height of a node using children information. */
+        private void update() {
+            size = 1;
+            height = 0;
+
+            if (left != null) {
+                size += left.size;
+                height = left.size;
+            }
+            if (right != null) {
+                size += right.size;
+                height = Integer.max(height, right.height);
+            }
+            height++;
+        }
     }
 
     /** Iterator. */
@@ -326,7 +342,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             node.right = add(node.right, value);
         }
 
-        update(node);
+        node.update();
 
         return balance(node);
     }
@@ -371,7 +387,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             return null;
         }
 
-        update(node);
+        node.update();
 
         return balance(node);
     }
@@ -407,8 +423,8 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         node.right = v.left;
         v.left = node;
-        update(node);
-        update(v);
+        node.update();
+        v.update();
 
         return v;
     }
@@ -419,8 +435,8 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         node.left = v.right;
         v.right = node;
-        update(node);
-        update(v);
+        node.update();
+        v.update();
 
         return v;
     }
@@ -439,12 +455,6 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             return 0;
         }
         return node.size;
-    }
-
-    /** Updates size and height of a node using children information. */
-    private void update(@NotNull Node node) {
-        node.size = size(node.left) + size(node.right) + 1;
-        node.height = Integer.max(height(node.left), height(node.right)) + 1;
     }
 
     /**
@@ -546,7 +556,6 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                 current = current.right;
             }
         }
-
 
         return current;
     }
