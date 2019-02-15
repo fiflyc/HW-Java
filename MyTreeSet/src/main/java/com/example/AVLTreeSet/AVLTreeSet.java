@@ -10,15 +10,15 @@ import java.util.NoSuchElementException;
 /**
  * TreeSet, containing AVL tree.
  * Implements interface MyTreeSet.
- * @param <T> -- type of elements in TreeSet
+ * @param <E> -- type of elements in TreeSet
  */
-public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
+public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** Node of a tree. */
-    private class Node<T> {
+    private class Node<E> {
 
         /** A value in a node. */
-        @NotNull private T value;
+        @NotNull private E value;
 
         /** Height of a subtree. */
         private int height;
@@ -27,18 +27,18 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         private int size;
 
         /** Left child. */
-        @Nullable private Node<T> left;
+        @Nullable private Node<E> left;
 
         /** Right child. */
-        @Nullable private Node<T> right;
+        @Nullable private Node<E> right;
 
         /** A node with next in order value. */
-        @Nullable private Node<T> next;
+        @Nullable private Node<E> next;
 
         /** A node with previous in order value. */
-        @Nullable private Node<T> prev;
+        @Nullable private Node<E> prev;
 
-        Node(@NotNull T value) {
+        Node(@NotNull E value) {
             this.value = value;
             left = null;
             right = null;
@@ -50,17 +50,17 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Iterator. */
-    private class Iterator<T> implements java.util.Iterator<T> {
+    private class Iterator<E> implements java.util.Iterator<E> {
 
-        @NotNull private AVLTreeSet<T> treeSet;
+        @NotNull private AVLTreeSet<E> treeSet;
 
-        @Nullable private AVLTreeSet<T>.Node<T> currentNode;
+        @Nullable private AVLTreeSet<E>.Node<E> currentNode;
 
         private boolean isReversed;
 
         private int version;
 
-        private Iterator(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
+        private Iterator(@NotNull AVLTreeSet<E> treeSet, boolean isReversed) {
             this.isReversed = isReversed;
             this.treeSet = treeSet;
             version = treeSet.version;
@@ -91,7 +91,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
          * @throws NoSuchElementException if an iteration has no elements
          */
         @Override
-        public T next() {
+        public E next() {
             if (version != treeSet.version) {
                 throw new IllegalStateException();
             }
@@ -99,7 +99,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
                 throw new NoSuchElementException();
             }
 
-            T result = currentNode.value;
+            E result = currentNode.value;
             if (isReversed ^ treeSet.isReversed) {
                 currentNode = currentNode.prev;
             } else {
@@ -110,16 +110,16 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
     }
     /** Root of a tree */
-    @Nullable private Node<T> root;
+    @Nullable private Node<E> root;
 
     /** An order of elements. */
     private boolean isReversed;
 
     /**
      * Compares elements.
-     * If type T or his parent does not implement Comparable<>, AVLTreeSet will no work.
+     * If type E or his parent does not implement Comparable<>, AVLTreeSet will no work.
      */
-    @Nullable private Comparator<? super T> comparator;
+    @Nullable private Comparator<? super E> comparator;
 
     /** Version of a tree.
      * Needs for disability iterators.
@@ -133,14 +133,12 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         version = 0;
     }
 
-    public AVLTreeSet(@NotNull Comparator<? super T> comparator) {
-        root = null;
+    public AVLTreeSet(@NotNull Comparator<? super E> comparator) {
+        this();
         this.comparator = comparator;
-        isReversed = false;
-        version = 0;
     }
 
-    private AVLTreeSet(@NotNull AVLTreeSet<T> treeSet, boolean isReversed) {
+    private AVLTreeSet(@NotNull AVLTreeSet<E> treeSet, boolean isReversed) {
         root = treeSet.root;
         comparator = treeSet.comparator;
         if (isReversed) {
@@ -156,7 +154,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @throws IllegalArgumentException if an element is null
      * @return true if an element wasn't in container before adding
      */
-    public boolean add(@NotNull T element) {
+    public boolean add(@NotNull E element) {
         if (contains(element)) {
             return false;
         }
@@ -178,7 +176,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         }
         version++;
 
-        root = remove(root, (T) element);
+        root = remove(root, (E) element);
 
         return false;
     }
@@ -189,7 +187,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @return true if an element in a container
      */
     public boolean contains(@NotNull Object element) {
-        return find((T) element) != null;
+        return find((E) element) != null;
     }
 
     /** Returns number of elements in container. */
@@ -199,24 +197,24 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return new Iterator<>(this, false);
     }
 
     @Override
-    public Iterator<T> descendingIterator() {
+    public Iterator<E> descendingIterator() {
         return new Iterator<>(this, true);
     }
 
     /** Makes a new AVLTreeSet with reversed order of elements without copying data. */
     @Override
-    public MyTreeSet<T> descendingSet() {
-        return new AVLTreeSet<T>(this, true);
+    public MyTreeSet<E> descendingSet() {
+        return new AVLTreeSet<E>(this, true);
     }
 
     /** Returns the first element by an order. */
     @Override
-    public T first() {
+    public E first() {
         var result = firstNode();
         if (result != null) {
             return result.value;
@@ -227,7 +225,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
 
     /** Returns the last element by an order. */
     @Override
-    public T last() {
+    public E last() {
         var result = lastNode();
         if (result != null) {
             return result.value;
@@ -241,7 +239,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @throws IllegalArgumentException if an element is null
      * */
     @Override
-    public T lower(@NotNull T element) {
+    public E lower(@NotNull E element) {
         var result = lower(root, element);
         if (result != null) {
             return result.value;
@@ -255,7 +253,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @throws IllegalArgumentException if an element is null
      * */
     @Override
-    public T floor(@NotNull T element) {
+    public E floor(@NotNull E element) {
         if (contains(element)) {
             return element;
         } else {
@@ -268,7 +266,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @throws IllegalArgumentException if an element is null
      * */
     @Override
-    public T ceiling(@NotNull T element) {
+    public E ceiling(@NotNull E element) {
         if (contains(element)) {
             return element;
         } else {
@@ -281,7 +279,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @throws IllegalArgumentException if an element is null
      * */
     @Override
-    public T higher(@NotNull T element) {
+    public E higher(@NotNull E element) {
         var result = higher(root, element);
         if (result != null) {
             return result.value;
@@ -293,17 +291,17 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     /**
      * Compares two elements.
      * Doesn't compile if x and y are incomparable.
-     * @param x first element with type super T
-     * @param y second element with type T
+     * @param x first element with type super E
+     * @param y second element with type E
      * @throws IllegalArgumentException if one of elements is null
      * @return a result of comparing: positive number if x > y, negative if x < y or zero if x and y are equal
      */
-    private int compare(@NotNull Object x, @NotNull T y) {
+    private int compare(@NotNull Object x, @NotNull E y) {
         if (comparator != null) {
-            return comparator.compare((T) x, y);
+            return comparator.compare((E) x, y);
         }
 
-        return ((Comparable<? super T>) x).compareTo(y);
+        return ((Comparable<? super E>) x).compareTo(y);
     }
 
     /**
@@ -311,9 +309,9 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @param node -- the root of a subtree
      * @return the of a new subtree
      */
-    private Node<T> add(@Nullable Node<T> node, @NotNull T value) {
+    private Node<E> add(@Nullable Node<E> node, @NotNull E value) {
         if (node == null) {
-            node = new Node<T>(value);
+            node = new Node<E>(value);
 
             node.prev = lower(root, value);
             if (node.prev != null) {
@@ -341,7 +339,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * @param node -- the root of a subtree
      * @return the root of a new subtree
      */
-    private Node<T> remove(@NotNull Node<T> node, @NotNull T value) {
+    private Node<E> remove(@NotNull Node<E> node, @NotNull E value) {
         if (compare(node.value, value) < 0) {
             node.right = remove(node.right, value);
         } else if (compare(node.value, value) > 0) {
@@ -359,12 +357,12 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
             } else if (node.left == null) {
                 node = node.right;
             } else {
-                Node v = node.right;
+                Node<E> v = node.right;
                 while (v.left != null) {
                     v = v.left;
                 }
 
-                T temp = (T) v.value;
+                E temp = (E) v.value;
                 v.value = node.value;
                 node.value = temp;
 
@@ -382,7 +380,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Balances a tree. */
-    private Node<T> balance(@Nullable Node<T> node) {
+    private Node<E> balance(@Nullable Node<E> node) {
         if (node == null) {
             return null;
         }
@@ -407,7 +405,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Left rotation. */
-    private Node<T> rotateLeft(@NotNull Node<T> node) {
+    private Node<E> rotateLeft(@NotNull Node<E> node) {
         var v = node.right;
 
         node.right = v.left;
@@ -419,7 +417,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Right rotation. */
-    private Node<T> rotateRight(@NotNull Node<T> node) {
+    private Node<E> rotateRight(@NotNull Node<E> node) {
         var v = node.left;
 
         node.left = v.right;
@@ -431,7 +429,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns height of a node in a tree or 0 if node is null. */
-    private int height(@Nullable Node<T> node) {
+    private int height(@Nullable Node<E> node) {
         if (node == null) {
             return 0;
         }
@@ -439,7 +437,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns size of a node in a tree or 0 if node is null. */
-    private int size(@Nullable Node<T> node) {
+    private int size(@Nullable Node<E> node) {
         if (node == null) {
             return 0;
         }
@@ -456,7 +454,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * Returns the greatest element lower than the given one in a subtree.
      * @param node -- the root of a subtree
      */
-    private Node<T> lower(@Nullable Node<T> node, @NotNull T element) {
+    private Node<E> lower(@Nullable Node<E> node, @NotNull E element) {
         if (node == null) {
             return null;
         }
@@ -479,7 +477,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
      * Returns the least element greater than the given one in a subtree.
      * @param node -- the root of a subtree
      */
-    private Node<T> higher(@Nullable Node<T> node, @NotNull T element) {
+    private Node<E> higher(@Nullable Node<E> node, @NotNull E element) {
         if (node == null) {
             return null;
         }
@@ -489,7 +487,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
         } else if (compare(node.value, element) < 0) {
             return higher(node.right, element);
         } else {
-            Node<T> result = higher(node.left, element);
+            Node<E> result = higher(node.left, element);
             if (result == null) {
                 return node;
             } else {
@@ -499,8 +497,8 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Finds a node contains matching value. */
-    private Node<T> find(@NotNull T value) {
-        Node<T> current = root;
+    private Node<E> find(@NotNull E value) {
+        Node<E> current = root;
 
         while (current != null) {
             if (compare(value, current.value) < 0) {
@@ -516,7 +514,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns a node with the first element by an order. */
-    private Node<T> firstNode() {
+    private Node<E> firstNode() {
         if (root == null) {
             return null;
         }
@@ -536,7 +534,7 @@ public class AVLTreeSet<T> extends AbstractSet<T> implements MyTreeSet<T> {
     }
 
     /** Returns a node with the last element by an order. */
-    private Node<T> lastNode() {
+    private Node<E> lastNode() {
         if (root == null) {
             return null;
         }
