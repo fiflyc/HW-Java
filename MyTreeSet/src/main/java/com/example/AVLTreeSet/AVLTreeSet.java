@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractSet;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 /**
@@ -95,7 +96,7 @@ public class AVLTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         @Override
         public boolean hasNext() {
             if (version != treeSet.version) {
-                throw new IllegalStateException();
+                throw new ConcurrentModificationException();
             }
 
             return currentNode != null;

@@ -3,6 +3,7 @@ package com.example.AVLTreeSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -61,7 +62,7 @@ class AVLTreeSetTest {
         treeSet.add(1);
 
         assertThrows(IllegalStateException.class, iterator::next);
-        assertThrows(IllegalStateException.class, iterator::hasNext);
+        assertThrows(ConcurrentModificationException.class, iterator::hasNext);
     }
 
     @Test
@@ -71,7 +72,7 @@ class AVLTreeSetTest {
         treeSet.remove(0);
 
         assertThrows(IllegalStateException.class, iterator::next);
-        assertThrows(IllegalStateException.class, iterator::hasNext);
+        assertThrows(ConcurrentModificationException.class, iterator::hasNext);
     }
 
     @Test
