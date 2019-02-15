@@ -58,11 +58,9 @@ public class Trie implements Serializable {
         }
 
         Node current = root;
-        Node next;
         boolean isSubstring = true;
-
         for (int i = 0; i < element.length(); i++) {
-            next = current.next.get(element.charAt(i));
+            var next = current.next.get(element.charAt(i));
             current.weight++;
 
             if (next != null) {
@@ -93,10 +91,8 @@ public class Trie implements Serializable {
         }
 
         Node current = root;
-        Node next;
-
         for (char symb: element.toCharArray()) {
-            next = current.next.get(symb);
+            var next = current.next.get(symb);
 
             if (next != null) {
                 current = next;
@@ -184,7 +180,7 @@ public class Trie implements Serializable {
      */
     @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
-        ObjectOutputStream objectOut = new ObjectOutputStream(out);
+        var objectOut = new ObjectOutputStream(out);
 
         if (root == null) {
             objectOut.writeInt(0);
@@ -205,9 +201,8 @@ public class Trie implements Serializable {
      */
     @Override
     public void deserialize(@NotNull InputStream in) throws IOException {
-        ObjectInputStream objectIn = new ObjectInputStream(in);
+        var objectIn = new ObjectInputStream(in);
 
-        HashMap<Integer, Node> nodes = new HashMap<>();
         treeSize = objectIn.readInt();
         if (treeSize == 0) {
             root = null;
@@ -217,6 +212,7 @@ public class Trie implements Serializable {
         size = objectIn.readInt();
         int rootHashCode = objectIn.readInt();
 
+        var nodes = new HashMap<Integer, Node>();
         for (int i = 0; i < treeSize; i++) {
             int hashCode = objectIn.readInt();
             Node node = nodes.get(hashCode);

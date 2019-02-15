@@ -166,17 +166,14 @@ class TrieTest {
 
     @Test
     void deserialize_DecodingEmptyTrie_ZeroSizedTrie() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (var out = new ByteArrayOutputStream()) {
+            trie.serialize(out);
 
-        trie.serialize(out);
+            ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+            trie.deserialize(in);
 
-        trie.deserialize(in);
-
-        assertEquals(0, trie.size());
-
-        out.close();
-        in.close();
+            assertEquals(0, trie.size());
+        }
     }
 }
