@@ -1,6 +1,8 @@
 language: java
 os:
 - linux
+jdk:
+- oraclejdk11
 env:
 - PROJECT_DIR=HashTable
 - PROJECT_DIR=Trie
