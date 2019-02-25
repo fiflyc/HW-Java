@@ -52,14 +52,18 @@ public class DBClient {
         var statement = connection.createStatement();
         ResultSet result;
 
-        int command = scanner.nextInt();
+        int command;
         String name;
         String newName;
         String number;
         String newNumber;
 
-        while (command != 0) {
+        while (true) {
+            command = scanner.nextInt();
+
             switch (command) {
+                case 0:
+                    return;
                 case 1:
                     name = scanner.next();
                     number = scanner.next();
@@ -68,6 +72,7 @@ public class DBClient {
                             "INSERT INTO Numbers(Number, Name) VALUES (\'" +
                                     number + "\', \'" +
                                     name + "\');");
+                    break;
                 case 2:
                     name = scanner.next();
                     result = statement.executeQuery(
@@ -77,6 +82,8 @@ public class DBClient {
                         writer.write(result.getString("Number") + " ");
                     }
                     writer.write('\n');
+
+                    break;
                 case 3:
                     number = scanner.next();
                     result = statement.executeQuery(
@@ -86,6 +93,8 @@ public class DBClient {
                         writer.write(result.getString("Name") + " ");
                     }
                     writer.write('\n');
+
+                    break;
                 case 4:
                     name = scanner.next();
                     number = scanner.next();
@@ -94,6 +103,8 @@ public class DBClient {
                             "DELETE FROM Numbers WHERE Name = \'" +
                                     name + "\' AND Number = \'" +
                                     number + "\';");
+
+                    break;
                 case 5:
                     name = scanner.next();
                     number = scanner.next();
@@ -104,6 +115,8 @@ public class DBClient {
                                     newName + "\' WHERE Name = \'" +
                                     name + "\' AND Number = \'" +
                                     number + "\';");
+
+                    break;
                 case 6:
                     name = scanner.next();
                     number = scanner.next();
@@ -114,6 +127,8 @@ public class DBClient {
                                     newNumber + "\' WHERE Name = \'" +
                                     name + "\' AND Number = \'" +
                                     number + "\';");
+
+                    break;
                 case 7:
                     result = statement.executeQuery("SELECT * FROM Numbers;");
 
@@ -122,11 +137,12 @@ public class DBClient {
                                 result.getString("Name") + " " +
                                 result.getString("Number") + "\n");
                     }
+
+                    break;
                 default:
                     writer.write("No such command!");
+                    break;
             }
-
-            command = scanner.nextInt();
         }
     }
 
