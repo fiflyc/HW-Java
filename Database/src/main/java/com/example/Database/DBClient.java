@@ -1,8 +1,6 @@
 package com.example.Database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +23,7 @@ class DBClient {
                     return 0;
                 } else {
                     try {
-                        out = new BufferedOutputStream (new FileOutputStream(args[1]);
+                        out = new BufferedOutputStream (new FileOutputStream(args[1]));
                     } catch (FileNotFoundException e) {
                         System.out.print("File \"" + args[1] + "\" not found.\n");
                         return 0;
@@ -41,9 +39,9 @@ class DBClient {
         try {
             run(System.in, out, "PhoneNumbers");
         } catch (IOException e) {
-            System.out.print("Error with writing result.");
+            System.out.print("Error: cannot write a result of the query.");
         } catch (SQLException e) {
-            System.out.print("The database does not exists.");
+            System.out.print("Error: something went wrong with database.");
         }
 
         return 0;
@@ -51,7 +49,106 @@ class DBClient {
 
 
     public void run(@NotNull InputStream in, @NotNull OutputStream out, @NotNull String dbName) throws IOException, SQLException {
-        
+        var scanner = new Scanner(in);
+        var writer = new OutputStreamWriter(out);
+        var connection = DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db");
+        var statement = connection.createStatement();
+        ResultSet result = null;
+
+        int command = scanner.nextInt();
+        String name;
+        String newName;
+        String number;
+        String newNumber;
+
+        while (command != 0) {
+            switch (command) {
+                case 1:
+                    name = scanner.next();
+                    number = scanner.next();
+
+                    statement.executeUpdate(
+                            "INSERT INTO Persons(Name, Number) VALUES (\'" +
+                                    name + "\', \'" +
+                                    number + "\');");
+                    statement.executeUpdate(
+                            "INSERT INTO Numbers(Number, Name) VALUES (\'" +
+                                    number + "\', \'" +
+                                    name + "\');");
+                case 2:
+                    name = scanner.next();
+                    result = statement.executeQuery(
+                            "SELECT Number FROM Persons WHERE Name = \'" + name + "\';");
+
+                    while (result.next()) {
+                        writer.write(result.getString("Number") + " ");
+                    }
+                    writer.write('\n');
+                case 3:
+                    number = scanner.next();
+                    result = statement.executeQuery(
+                            "SELECT Name FROM Numbers WHERE Number = \'" + number + "\';");
+
+                    while (result.next()) {
+                        writer.write(result.getString("Name") + " ");
+                    }
+                    writer.write('\n');
+                case 4:
+                    name = scanner.next();
+                    number = scanner.next();
+
+                    statement.executeUpdate(
+                            "DELETE FROM Persons WHERE Name = \'" +
+                                    name + "\' AND Number = \'" +
+                                    number + "\';");
+                    statement.executeUpdate(
+                            "DELETE  FROM Numbers WHERE Number = \'" +
+                                    number + "\' AND Name = \'" +
+                                    name + "\';");
+                case 5:
+                    name = scanner.next();
+                    number = scanner.next();
+                    newName = scanner.next();
+
+                    statement.executeUpdate(
+                            "UPDATE Persons SET Name = \'" +
+                                    newName + "\' WHERE Name = \'" +
+                                    name + "\' AND Number = \'" +
+                                    number + "\';");
+                    statement.executeUpdate(
+                            "UPDATE Numbers SET Name = \'" +
+                                    newName + "\' WHERE Name = \'" +
+                                    name + "\' AND Number = \'" +
+                                    number + "\';");
+                case 6:
+                    name = scanner.next();
+                    number = scanner.next();
+                    newNumber = scanner.next();
+
+                    statement.executeUpdate(
+                            "UPDATE Persons SET Number = \'" +
+                                    newNumber + "\' WHERE Name = \'" +
+                                    name + "\' AND Number = \'" +
+                                    number + "\';");
+                    statement.executeUpdate(
+                            "UPDATE Numbers SET Number = \'" +
+                                    newNumber + "\' WHERE Name = \'" +
+                                    name + "\' AND Number = \'" +
+                                    number + "\';");
+                case 7:
+                    result = statement.executeQuery("SELECT * FROM Persons;");
+
+                    while (result.next()) {
+                        writer.write(
+                                result.getString("Name") + " " +
+                                result.getString("Number") + "\n");
+                    }
+                default:
+                    writer.write("No such command!");
+            }
+
+            command = scanner.nextInt();
+        }
     }
 
     private static void printHelp() {
