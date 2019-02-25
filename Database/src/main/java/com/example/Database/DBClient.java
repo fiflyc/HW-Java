@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
-class DBClient {
+public class DBClient {
 
     public int main(String[] args) {
         BufferedOutputStream out = null;
