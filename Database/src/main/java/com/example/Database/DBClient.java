@@ -38,9 +38,9 @@ public class DBClient {
         try {
             run(System.in, out, "PhoneNumbers");
         } catch (IOException e) {
-            System.out.print("Error: cannot write a result of the query.");
+            System.out.print("Error: " + e.getMessage() + "\n");
         } catch (SQLException e) {
-            System.out.print("Error: something went wrong with database.");
+            System.out.print("Error: " + e.getMessage() + "\n");
         }
     }
 
@@ -50,7 +50,7 @@ public class DBClient {
         var writer = new OutputStreamWriter(out);
         var connection = DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db");
         var statement = connection.createStatement();
-        ResultSet result = null;
+        ResultSet result;
 
         int command = scanner.nextInt();
         String name;
