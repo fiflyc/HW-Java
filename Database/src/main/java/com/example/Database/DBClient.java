@@ -65,17 +65,13 @@ public class DBClient {
                     number = scanner.next();
 
                     statement.executeUpdate(
-                            "INSERT INTO Persons(Name, Number) VALUES (\'" +
-                                    name + "\', \'" +
-                                    number + "\');");
-                    statement.executeUpdate(
                             "INSERT INTO Numbers(Number, Name) VALUES (\'" +
                                     number + "\', \'" +
                                     name + "\');");
                 case 2:
                     name = scanner.next();
                     result = statement.executeQuery(
-                            "SELECT Number FROM Persons WHERE Name = \'" + name + "\';");
+                            "SELECT Number FROM Numbers WHERE Name = \'" + name + "\';");
 
                     while (result.next()) {
                         writer.write(result.getString("Number") + " ");
@@ -95,23 +91,14 @@ public class DBClient {
                     number = scanner.next();
 
                     statement.executeUpdate(
-                            "DELETE FROM Persons WHERE Name = \'" +
+                            "DELETE FROM Numbers WHERE Name = \'" +
                                     name + "\' AND Number = \'" +
                                     number + "\';");
-                    statement.executeUpdate(
-                            "DELETE  FROM Numbers WHERE Number = \'" +
-                                    number + "\' AND Name = \'" +
-                                    name + "\';");
                 case 5:
                     name = scanner.next();
                     number = scanner.next();
                     newName = scanner.next();
 
-                    statement.executeUpdate(
-                            "UPDATE Persons SET Name = \'" +
-                                    newName + "\' WHERE Name = \'" +
-                                    name + "\' AND Number = \'" +
-                                    number + "\';");
                     statement.executeUpdate(
                             "UPDATE Numbers SET Name = \'" +
                                     newName + "\' WHERE Name = \'" +
@@ -123,17 +110,12 @@ public class DBClient {
                     newNumber = scanner.next();
 
                     statement.executeUpdate(
-                            "UPDATE Persons SET Number = \'" +
-                                    newNumber + "\' WHERE Name = \'" +
-                                    name + "\' AND Number = \'" +
-                                    number + "\';");
-                    statement.executeUpdate(
                             "UPDATE Numbers SET Number = \'" +
                                     newNumber + "\' WHERE Name = \'" +
                                     name + "\' AND Number = \'" +
                                     number + "\';");
                 case 7:
-                    result = statement.executeQuery("SELECT * FROM Persons;");
+                    result = statement.executeQuery("SELECT * FROM Numbers;");
 
                     while (result.next()) {
                         writer.write(
