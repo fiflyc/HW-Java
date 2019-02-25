@@ -15,10 +15,12 @@ public class DBClient {
             if (args[0].equals("-h") || args[0].equals("--help")) {
                 System.out.print("This is the phone database client.\n\n");
                 printHelp();
+                return;
             } else if (args[0].equals("-o") || args[0].equals("--output")) {
                 if (args.length == 1) {
                     System.out.print("You have not wrote filename!\n\n");
                     printHelp();
+                    return;
                 } else {
                     try {
                         out = new BufferedOutputStream (new FileOutputStream(args[1]));
@@ -149,7 +151,7 @@ public class DBClient {
     private static void printHelp() {
         System.out.print(
                 "Options:\n\t-h (--help) get help\n\t-o (--output) [FILE] write results in FILE\n" +
-                "Usage:\n\t" +
+                "Usage:\n" +
                 "\t0 - exit\n" +
                 "\t1 [NAME] [NUMBER] - add a record NAME-NUMBER\n" +
                 "\t2 [NAME] - get phones by NAME\n" +
