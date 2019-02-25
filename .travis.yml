@@ -7,5 +7,5 @@ env:
 - PROJECT_DIR=HashTable
 - PROJECT_DIR=Trie
 - PROJECT_DIR=MyTreeSet
-- PROJECT_DIT=Database
+- PROJECT_DIR=Database
 script: cd $PROJECT_DIR && ./gradlew check
