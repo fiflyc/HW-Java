@@ -38,9 +38,9 @@ public class DBClient {
         try {
             run(System.in, out, "PhoneNumbers");
         } catch (IOException e) {
-            System.out.print("Error: " + e.getMessage() + "\n");
+            System.out.print("IO error: " + e.getMessage() + "\n");
         } catch (SQLException e) {
-            System.out.print("Error: " + e.getMessage() + "\n");
+            System.out.print("DB error: " + e.getMessage() + "\n");
         }
     }
 
@@ -82,6 +82,7 @@ public class DBClient {
                         writer.write(result.getString("Number") + " ");
                     }
                     writer.write('\n');
+                    writer.flush();
 
                     break;
                 case 3:
@@ -93,6 +94,7 @@ public class DBClient {
                         writer.write(result.getString("Name") + " ");
                     }
                     writer.write('\n');
+                    writer.flush();;
 
                     break;
                 case 4:
@@ -137,10 +139,12 @@ public class DBClient {
                                 result.getString("Name") + " " +
                                 result.getString("Number") + "\n");
                     }
+                    writer.flush();
 
                     break;
                 default:
                     writer.write("No such command!");
+                    writer.flush();
                     break;
             }
         }
