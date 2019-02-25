@@ -6,37 +6,68 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
+enum Mode { SILENT, INTERACTIVE }
+
 public class DBClient {
 
     public static void main(String[] args) {
-        BufferedOutputStream out = null;
+        if (args.length == 0) {
+            printHelp();
+            return;
+        }
 
-        if (args.length > 0) {
-            if (args[0].equals("-h") || args[0].equals("--help")) {
+        BufferedOutputStream out = null;
+        BufferedInputStream in = null;
+
+        for (int i = 1; i < args.length;) {
+            if (args[i].equals("-h") || args[i].equals("--help")) {
                 System.out.print("This is the phone database client.\n\n");
                 printHelp();
                 return;
-            } else if (args[0].equals("-o") || args[0].equals("--output")) {
-                if (args.length == 1) {
+            } else if (args[i].equals("-o") || args[i].equals("--output")) {
+                if (args.length == i + 1) {
                     System.out.print("You have not wrote filename!\n\n");
                     printHelp();
                     return;
                 } else {
                     try {
-                        out = new BufferedOutputStream (new FileOutputStream(args[1]));
+                        out = new BufferedOutputStream(new FileOutputStream(args[i + 1]));
                     } catch (FileNotFoundException e) {
-                        System.out.print("File \"" + args[1] + "\" not found.\n");
+                        System.out.print("File \"" + args[i + 1] + "\" not found.\n");
                     }
+                    i += 2;
                 }
+            } else if (args[i].equals("-i") || args[i].equals("--input")) {
+                if (args.length == i + 1) {
+                    System.out.print("You have not wrote filename!\n\n");
+                    printHelp();
+                    return;
+                } else {
+                    try {
+                        in = new BufferedInputStream(new FileInputStream(args[i + 1]));
+                    } catch (FileNotFoundException e) {
+                        System.out.print("File \"" + args[i + 1] + "\" not found.\n");
+                    }
+                    i += 2;
+                }
+            } else {
+                System.out.print("Unknown key!\n");
+                printHelp();
+                return;
             }
         }
 
+        Mode mode = Mode.SILENT;
         if (out == null) {
             out = new BufferedOutputStream(System.out);
         }
+        if (in == null) {
+            in = new BufferedInputStream(System.in);
+            mode = Mode.INTERACTIVE;
+        }
 
         try {
-            run(System.in, out, "PhoneNumbers");
+            run(in, out, args[0], mode);
         } catch (IOException e) {
             System.out.print("IO error: " + e.getMessage() + "\n");
         } catch (SQLException e) {
@@ -45,7 +76,10 @@ public class DBClient {
     }
 
 
-    public static void run(@NotNull InputStream in, @NotNull OutputStream out, @NotNull String dbName) throws IOException, SQLException {
+    public static void run(@NotNull InputStream in,
+                           @NotNull OutputStream out,
+                           @NotNull String dbName,
+                           @NotNull Mode mode) throws IOException, SQLException {
         var scanner = new Scanner(in);
         var writer = new OutputStreamWriter(out);
         var connection = DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db");
@@ -59,6 +93,10 @@ public class DBClient {
         String newNumber;
 
         while (true) {
+            if (mode == Mode.INTERACTIVE) {
+                writer.write(dbName + "> ");
+                writer.flush();
+            }
             command = scanner.nextInt();
 
             switch (command) {
@@ -142,6 +180,11 @@ public class DBClient {
                     writer.flush();
 
                     break;
+                case 8:
+                    if (mode == Mode.INTERACTIVE) {
+                        printCommands();
+                    }
+                    break;
                 default:
                     writer.write("No such command!");
                     writer.flush();
@@ -152,16 +195,26 @@ public class DBClient {
 
     private static void printHelp() {
         System.out.print(
-                "Options:\n\t-h (--help) get help\n\t-o (--output) [FILE] write results in FILE\n" +
-                "Usage:\n" +
-                "\t0 - exit\n" +
-                "\t1 [NAME] [NUMBER] - add a record NAME-NUMBER\n" +
-                "\t2 [NAME] - get phones by NAME\n" +
-                "\t3 [NUMBER] - get names by NUMBER\n" +
-                "\t4 [NAME] [NUMBER] - remove a record NAME-NUMBER\n" +
-                "\t5 [NAME] [NUMBER] [NEW NAME] - change name in a record NAME-NUMBER\n" +
-                "\t6 [NAME] [NUMBER] [NEW NUMBER] - change phone in a record NAME-NUMBER\n" +
-                "\t7 - print all records\n" +
-                "\tAll names and phones does not contains whitespaces!\n");
+                "Usage:\tDBClient [BASE NAME] [KEY]..." +
+                "Keys:\n" +
+                "\t-h (--help) get help\n" +
+                "\t-o (--output) [FILE] write results in FILE\n" +
+                "\t-i (--input) [FILE] get commands from FILE\n");
+        printCommands();
+    }
+
+    private static void printCommands() {
+        System.out.print(
+                "Commands:\n" +
+                        "\t0 - exit\n" +
+                        "\t1 [NAME] [NUMBER] - add a record NAME-NUMBER\n" +
+                        "\t2 [NAME] - get phones by NAME\n" +
+                        "\t3 [NUMBER] - get names by NUMBER\n" +
+                        "\t4 [NAME] [NUMBER] - remove a record NAME-NUMBER\n" +
+                        "\t5 [NAME] [NUMBER] [NEW NAME] - change name in a record NAME-NUMBER\n" +
+                        "\t6 [NAME] [NUMBER] [NEW NUMBER] - change phone in a record NAME-NUMBER\n" +
+                        "\t7 - print all records\n" +
+                        "\t8 - print list of commands (if you use console)\n" +
+                        "\tAll names and phones does not contains whitespaces!\n");
     }
 }
