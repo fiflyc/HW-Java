@@ -8,25 +8,22 @@ import java.io.*;
 
 public class DBClient {
 
-    public int main(String[] args) {
+    public static void main(String[] args) {
         BufferedOutputStream out = null;
 
         if (args.length > 0) {
             if (args[0].equals("-h") || args[0].equals("--help")) {
                 System.out.print("This is the phone database client.\n\n");
                 printHelp();
-                return 0;
             } else if (args[0].equals("-o") || args[0].equals("--output")) {
                 if (args.length == 1) {
                     System.out.print("You have not wrote filename!\n\n");
                     printHelp();
-                    return 0;
                 } else {
                     try {
                         out = new BufferedOutputStream (new FileOutputStream(args[1]));
                     } catch (FileNotFoundException e) {
                         System.out.print("File \"" + args[1] + "\" not found.\n");
-                        return 0;
                     }
                 }
             }
@@ -43,12 +40,10 @@ public class DBClient {
         } catch (SQLException e) {
             System.out.print("Error: something went wrong with database.");
         }
-
-        return 0;
     }
 
 
-    public void run(@NotNull InputStream in, @NotNull OutputStream out, @NotNull String dbName) throws IOException, SQLException {
+    public static void run(@NotNull InputStream in, @NotNull OutputStream out, @NotNull String dbName) throws IOException, SQLException {
         var scanner = new Scanner(in);
         var writer = new OutputStreamWriter(out);
         var connection = DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db");
