@@ -58,6 +58,14 @@ public class Injector {
         treeNodes.put(rootClassName, root);
 
         for (Class current: rootConstructor.getParameterTypes()) {
+            if (current.isInterface()) {
+                String currentName = findClassByInterface(current.getCanonicalName(), implementationClassNames);
+                if (currentName == null) {
+                    throw new ImplementationNotFoundException();
+                }
+                current = Class.forName(currentName);
+            }
+
             int numberOfClasses = 0;
             for (String name: implementationClassNames) {
                 if (name.equals(current.getCanonicalName())) {
@@ -96,5 +104,17 @@ public class Injector {
         way.remove(root);
 
         return true;
+    }
+
+    private static String findClassByInterface(String name, List<String> classNames) throws ClassNotFoundException {
+        Class<?> interfaceDescription = Class.forName(name);
+        for (String currentName: classNames) {
+            Class<?> current = Class.forName(currentName);
+            if (current.isAssignableFrom(interfaceDescription)) {
+                return currentName;
+            }
+        }
+
+        return null;
     }
 }
