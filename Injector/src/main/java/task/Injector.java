@@ -2,6 +2,7 @@ package task;
 
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,20 @@ public class Injector {
             throw new InjectionCycleException();
         }
 
+        return initializeByTree(root);
+    }
 
+    private static Object initializeByTree(Node root) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        ArrayList<Object> parameters = new ArrayList<>();
+
+        for (Node current: root.children) {
+            parameters.add(initializeByTree(current));
+        }
+
+        Class<?> rootClass = Class.forName(root.name);
+        Constructor<?> rootConstructor = rootClass.getConstructor();
+
+        return rootConstructor.newInstance(parameters.toArray());
     }
 
     private static Node buildTree(String rootClassName, List<String> implementationClassNames, HashMap<String, Node> treeNodes) throws Exception {
@@ -52,7 +66,7 @@ public class Injector {
             }
 
             if (numberOfClasses == 0) {
-                throw new ImplementationNotFoundException;
+                throw new ImplementationNotFoundException();
             } else if (numberOfClasses > 1) {
                 throw new AmbiguousImplementationException();
             }
