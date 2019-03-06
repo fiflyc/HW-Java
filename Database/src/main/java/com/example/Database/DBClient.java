@@ -6,8 +6,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
+/**
+ * Launch type.
+ * SILENT -- get commands from file.
+ * INTERACTIVE -- get commands from console.
+ */
 enum Mode { SILENT, INTERACTIVE }
 
+/**
+ * Database console client.
+ * Run with --help to read how-to-use information.
+ */
 public class DBClient {
 
     public static void main(String[] args) {
@@ -75,7 +84,15 @@ public class DBClient {
         }
     }
 
-
+    /**
+     * Commands handler.
+     * @param in input commands
+     * @param out result output
+     * @param dbName database name
+     * @param mode launch type (get commands from console or file)
+     * @throws IOException
+     * @throws SQLException
+     */
     public static void run(@NotNull InputStream in,
                            @NotNull OutputStream out,
                            @NotNull String dbName,
@@ -193,6 +210,9 @@ public class DBClient {
         }
     }
 
+    /**
+     * Prints usage and keys.
+     */
     private static void printHelp() {
         System.out.print(
                 "Usage:\tDBClient [BASE NAME] [KEY]..." +
@@ -203,6 +223,9 @@ public class DBClient {
         printCommands();
     }
 
+    /**
+     * Prints list of commands.
+     */
     private static void printCommands() {
         System.out.print(
                 "Commands:\n" +
