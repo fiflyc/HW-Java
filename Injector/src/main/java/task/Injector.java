@@ -46,7 +46,7 @@ public class Injector {
         }
 
         Class<?> rootClass = Class.forName(root.name);
-        Constructor<?> rootConstructor = rootClass.getConstructor();
+        Constructor<?> rootConstructor = rootClass.getDeclaredConstructors()[0];
 
         return rootConstructor.newInstance(parameters.toArray());
     }
@@ -54,7 +54,7 @@ public class Injector {
     private static Node buildTree(String rootClassName, List<String> implementationClassNames, HashMap<String, Node> treeNodes) throws Exception {
         Node root = new  Node(rootClassName, new ArrayList<>());
         Class<?> rootClass = Class.forName(rootClassName);
-        Constructor<?> rootConstructor = rootClass.getConstructor();
+        Constructor<?> rootConstructor = rootClass.getDeclaredConstructors()[0];
         treeNodes.put(rootClassName, root);
 
         for (Class current: rootConstructor.getParameterTypes()) {
