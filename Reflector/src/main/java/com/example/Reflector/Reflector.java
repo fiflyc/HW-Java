@@ -64,10 +64,9 @@ public class Reflector {
                 writer.write(Modifier.toString(current.getModifiers()));
                 writer.write(" ");
             }
-            writer.write(current.getGenericType().getTypeName().replace('$', '.'));
-            writer.write(" ");
-            writer.write(current.getName());
-            writer.write(";\n");
+
+            writer.write(current.getGenericType().getTypeName().replace('$', '.') + " ");
+            writer.write(current.getName() + ";\n");
         }
     }
 
@@ -82,27 +81,25 @@ public class Reflector {
         for (var current: someClass.getDeclaredMethods()) {
             writer.write("\t");
             if (current.getModifiers() != 0) {
-                writer.write(Modifier.toString(current.getModifiers()));
-                writer.write(" ");
+                writer.write(Modifier.toString(current.getModifiers()) + " ");
             }
-            writer.write(current.getGenericReturnType().getTypeName().replace('$', '.'));
-            writer.write(" ");
-            writer.write(current.getName());
-            writer.write("(");
+
+            writer.write(current.getGenericReturnType().getTypeName().replace('$', '.') + " ");
+            writer.write(current.getName() + "(");
+
             if (current.getGenericParameterTypes().length > 0) {
                 var parameters = current.getGenericParameterTypes();
                 for (int i = 0; i < parameters.length - 1; i++) {
-                    writer.write(parameters[i].getTypeName().replace('$', '.'));
-                    writer.write(" ");
+                    writer.write(parameters[i].getTypeName().replace('$', '.') + " ");
                 }
                 writer.write(parameters[parameters.length - 1].getTypeName().replace('$', '.'));
             }
             writer.write(")");
+
             if (current.getGenericExceptionTypes().length > 0) {
                 var exceptions = current.getGenericExceptionTypes();
                 for (int i = 0; i < exceptions.length - 1; i++) {
-                    writer.write(exceptions[i].getTypeName().replace('$', '.'));
-                    writer.write(" ");
+                    writer.write(exceptions[i].getTypeName().replace('$', '.') + " ");
                 }
                 writer.write(exceptions[exceptions.length - 1].getTypeName().replace('$', '.'));
             }
