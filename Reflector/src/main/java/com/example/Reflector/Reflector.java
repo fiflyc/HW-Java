@@ -34,17 +34,15 @@ public class Reflector {
      */
     public static void printClass(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         printClassHeading(someClass, writer, prefix);
-        writer.write(" {\n\n");
+        writer.write(" {\n");
 
         for (var innerClass: someClass.getDeclaredClasses()) {
             printClass(innerClass, writer, prefix + "\t");
-            writer.write("\n\n");
         }
 
         printAllFields(someClass, writer, prefix + "\t");
-        writer.write("\n");
         printAllMethods(someClass, writer, prefix + "\t");
-        writer.write("}\n");
+        writer.write(prefix + "}\n");
 
         writer.flush();
     }
@@ -140,7 +138,7 @@ public class Reflector {
 
             if (Modifier.isAbstract(method.getModifiers())) {
                 writer.write(";\n");
-            } else if (method.getReturnType() == null) {
+            } else if (method.getReturnType() == void.class) {
                 writer.write(" {\n" + prefix + "\treturn;\n" + prefix + "}\n");
             } else if (method.getReturnType() == Boolean.class || method.getReturnType() == boolean.class) {
                 writer.write(" {\n"+ prefix + "\treturn false;\n" + prefix + "}\n");
