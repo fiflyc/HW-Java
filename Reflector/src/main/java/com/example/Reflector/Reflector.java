@@ -1,5 +1,8 @@
 package com.example.Reflector;
 
+import com.example.Reflector.TestClass.TestClass;
+import com.google.common.base.Defaults;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,6 +10,10 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Modifier;
 
 public class Reflector {
+
+    public static void main(String[] args) throws IOException {
+        printStructure(TestClass.class);
+    }
 
     public static void printStructure(Class<?> someClass) throws IOException {
         File file = new File("." + File.separator, someClass.getName() + ".java");
@@ -17,7 +24,7 @@ public class Reflector {
             writer.write(" {\n\n");
             printAllFields(someClass, writer);
             writer.write("\n");
-            printAllMethods(someClass, writer);
+            printAllMethods(someClass, writer, Modifier.isAbstract(someClass.getModifiers()));
             writer.write("}\n");
 
             writer.flush();
@@ -77,7 +84,7 @@ public class Reflector {
      * @param writer output writer
      * @throws IOException
      */
-    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer) throws IOException {
+    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, boolean isAbstract) throws IOException {
         for (var current: someClass.getDeclaredMethods()) {
             writer.write("\t");
             if (current.getModifiers() != 0) {
@@ -103,7 +110,20 @@ public class Reflector {
                 }
                 writer.write(exceptions[exceptions.length - 1].getTypeName().replace('$', '.'));
             }
-            writer.write(";\n");
+
+            if (isAbstract) {
+                writer.write(";\n");
+            } else if (current.getReturnType() == null) {
+                writer.write(" {\n\t\treturn;\n\t}\n");
+            } else if (current.getReturnType() == Boolean.class || current.getReturnType() == boolean.class) {
+                writer.write(" {\n\t\treturn false;\n\t}\n");
+            } else if (current.getReturnType() == Character.class || current.getReturnType() == char.class) {
+                writer.write(" {\n\t\treturn '\0';\n\t}\n");
+            } else if (current.getReturnType().isPrimitive()) {
+                writer.write(" {\n\t\treturn 0;\n\t}\n");
+            } else {
+                writer.write(" {\n\t\treturn null;\n\t}\n");
+            }
         }
     }
 }
