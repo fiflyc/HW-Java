@@ -147,6 +147,10 @@ public class DBClient {
         }
     }
 
+    /**
+     * Inserts a record.
+     * @throws SQLException
+     */
     private static void insert(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
@@ -158,6 +162,11 @@ public class DBClient {
         statement.execute();
     }
 
+    /**
+     * Writes numbers by name.
+     * @throws IOException
+     * @throws SQLException
+     */
     private static void numbersByName(@NotNull Scanner scanner,
                                       @NotNull Writer writer,
                                       @NotNull Connection connection) throws IOException, SQLException {
@@ -173,6 +182,11 @@ public class DBClient {
         writer.flush();
     }
 
+    /**
+     * Writes names by number.
+     * @throws SQLException
+     * @throws IOException
+     */
     private static void namesByNumber(@NotNull Scanner scanner,
                                       @NotNull Writer writer,
                                       @NotNull Connection connection) throws SQLException, IOException {
@@ -189,6 +203,10 @@ public class DBClient {
         writer.flush();
     }
 
+    /**
+     * Removes a record.
+     * @throws SQLException
+     */
     private static void remove(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
@@ -200,6 +218,10 @@ public class DBClient {
         statement.execute();
     }
 
+    /**
+     * Change name in a record.
+     * @throws SQLException
+     */
     private static void changeName(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
@@ -213,6 +235,10 @@ public class DBClient {
         statement.execute();
     }
 
+    /**
+     * Change number in a record.
+     * @throws SQLException
+     */
     private static void changeNumber(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
@@ -226,6 +252,11 @@ public class DBClient {
         statement.execute();
     }
 
+    /**
+     * Prints table.
+     * @throws SQLException
+     * @throws IOException
+     */
     private static void printTable(@NotNull Writer writer, @NotNull Statement statement) throws SQLException, IOException {
         var result = statement.executeQuery("SELECT * FROM Numbers;");
 
