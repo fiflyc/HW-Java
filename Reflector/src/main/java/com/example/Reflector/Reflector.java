@@ -6,8 +6,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Modifier;
 
+/**
+ * Contains static methods for generating .java file with class definition.
+ */
 public class Reflector {
 
+    /**
+     * Prints structure of a class.
+     * @param someClass class for printing
+     * @throws IOException
+     */
     public static void printStructure(Class<?> someClass) throws IOException {
         File file = new File("." + File.separator, someClass.getName() + ".java");
         try (var fileOutputStream = new FileOutputStream(file)) {
