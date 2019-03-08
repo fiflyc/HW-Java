@@ -114,22 +114,22 @@ public class DBClient {
                 case 0:
                     return;
                 case 1:
-                    insert(scanner, statement);
+                    insert(scanner, connection);
                     break;
                 case 2:
-                    numbersByName(scanner, writer, statement);
+                    numbersByName(scanner, writer, connection);
                     break;
                 case 3:
-                    namesByNumber(scanner, writer, statement);
+                    namesByNumber(scanner, writer, connection);
                     break;
                 case 4:
-                    remove(scanner, statement);
+                    remove(scanner, connection);
                     break;
                 case 5:
-                    changeName(scanner, statement);
+                    changeName(scanner, connection);
                     break;
                 case 6:
-                    changeNumber(scanner, statement);
+                    changeNumber(scanner, connection);
                     break;
                 case 7:
                     printTable(writer, statement);
@@ -147,22 +147,24 @@ public class DBClient {
         }
     }
 
-    private static void insert(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+    private static void insert(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
 
-        statement.executeUpdate(
-                "INSERT INTO Numbers(Number, Name) VALUES (\'" +
-                        number + "\', \'" +
-                        name + "\');");
+        var statement = connection.prepareStatement("INSERT INTO Numbers(Number, Name) VALUES (?, ?);");
+        statement.setString(1, number);
+        statement.setString(2, name);
+
+        statement.execute();
     }
 
     private static void numbersByName(@NotNull Scanner scanner,
                                       @NotNull Writer writer,
-                                      @NotNull Statement statement) throws IOException, SQLException {
+                                      @NotNull Connection connection) throws IOException, SQLException {
         var name = scanner.next();
-        var result = statement.executeQuery(
-                "SELECT Number FROM Numbers WHERE Name = \'" + name + "\';");
+        var statement = connection.prepareStatement("SELECT Number FROM Numbers WHERE Name = ?;");
+        statement.setString(1, name);
+        var result = statement.executeQuery();
 
         while (result.next()) {
             writer.write(result.getString("Number") + " ");
@@ -173,10 +175,12 @@ public class DBClient {
 
     private static void namesByNumber(@NotNull Scanner scanner,
                                       @NotNull Writer writer,
-                                      @NotNull Statement statement) throws SQLException, IOException {
+                                      @NotNull Connection connection) throws SQLException, IOException {
         var number = scanner.next();
-        var result = statement.executeQuery(
-                "SELECT Name FROM Numbers WHERE Number = \'" + number + "\';");
+        var statement = connection.prepareStatement("SELECT Name FROM Numbers WHERE Number = ?;");
+
+        statement.setString(1, number);
+        var result = statement.executeQuery();
 
         while (result.next()) {
             writer.write(result.getString("Name") + " ");
@@ -185,38 +189,41 @@ public class DBClient {
         writer.flush();
     }
 
-    private static void remove(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+    private static void remove(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
 
-        statement.executeUpdate(
-                "DELETE FROM Numbers WHERE Name = \'" +
-                        name + "\' AND Number = \'" +
-                        number + "\';");
+        var statement = connection.prepareStatement("DELETE FROM Numbers WHERE Name = ? AND Number = ?;");
+        statement.setString(1, name);
+        statement.setString(2, number);
+
+        statement.execute();
     }
 
-    private static void changeName(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+    private static void changeName(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
         var newName = scanner.next();
 
-        statement.executeUpdate(
-                "UPDATE Numbers SET Name = \'" +
-                        newName + "\' WHERE Name = \'" +
-                        name + "\' AND Number = \'" +
-                        number + "\';");
+        var statement = connection.prepareStatement("UPDATE Numbers SET Name = ? WHERE Name = ? AND Number = ?;");
+        statement.setString(1, newName);
+        statement.setString(2, name);
+        statement.setString(3, number);
+
+        statement.execute();
     }
 
-    private static void changeNumber(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+    private static void changeNumber(@NotNull Scanner scanner, @NotNull Connection connection) throws SQLException {
         var name = scanner.next();
         var number = scanner.next();
         var newNumber = scanner.next();
 
-        statement.executeUpdate(
-                "UPDATE Numbers SET Number = \'" +
-                        newNumber + "\' WHERE Name = \'" +
-                        name + "\' AND Number = \'" +
-                        number + "\';");
+        var statement = connection.prepareStatement("UPDATE Numbers SET Number = ? WHERE Name = ? AND Number = ?;");
+        statement.setString(1, newNumber);
+        statement.setString(2, name);
+        statement.setString(3, number);
+
+        statement.execute();
     }
 
     private static void printTable(@NotNull Writer writer, @NotNull Statement statement) throws SQLException, IOException {
