@@ -41,6 +41,7 @@ public class Reflector {
         }
 
         printAllFields(someClass, writer, prefix + "\t");
+        printAllConstructors(someClass, writer, prefix + "\t");
         printAllMethods(someClass, writer, prefix + "\t");
         writer.write(prefix + "}\n");
 
@@ -95,6 +96,31 @@ public class Reflector {
 
             writer.write(field.getGenericType().getTypeName().replace('$', '.') + " ");
             writer.write(field.getName() + ";\n");
+        }
+    }
+
+    /**
+     * Prints all constructor of a class.
+     * @param someClass class for printing.
+     * @param writer output writer
+     * @param prefix prefix of each line of output
+     * @throws IOException
+     */
+    private static void printAllConstructors(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
+        for (var constructor: someClass.getDeclaredConstructors()) {
+            if (constructor.isSynthetic()) {
+                continue;
+            }
+
+            writer.write(prefix + constructor.getName().replace('$', '.') + "(");
+            if (constructor.getGenericParameterTypes().length > 0) {
+                var parameters = constructor.getGenericParameterTypes();
+                for (int i = 0; i < parameters.length - 1; i++) {
+                    writer.write(parameters[i].getTypeName().replace('$', '.') + " ");
+                }
+                writer.write(parameters[parameters.length - 1].getTypeName().replace('$', '.'));
+            }
+            writer.write(") {\n" + prefix + "}\n");
         }
     }
 
