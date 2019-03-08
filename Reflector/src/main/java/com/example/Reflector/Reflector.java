@@ -52,7 +52,7 @@ public class Reflector {
         writer.write(prefix);
         writer.write(someClass.toGenericString().replace('$', '.'));
 
-        if (someClass.getSuperclass() != null) {
+        if (someClass.getSuperclass() != Object.class) {
             writer.write(" extends ");
             writer.write(someClass.getSuperclass().getCanonicalName().replace('$', '.'));
         }
