@@ -65,15 +65,15 @@ public class Reflector {
      * @throws IOException
      */
     private static void printAllFields(Class<?> someClass, OutputStreamWriter writer) throws IOException {
-        for (var current: someClass.getDeclaredFields()) {
+        for (var field: someClass.getDeclaredFields()) {
             writer.write("\t");
-            if (current.getModifiers() != 0) {
-                writer.write(Modifier.toString(current.getModifiers()));
+            if (field.getModifiers() != 0) {
+                writer.write(Modifier.toString(field.getModifiers()));
                 writer.write(" ");
             }
 
-            writer.write(current.getGenericType().getTypeName().replace('$', '.') + " ");
-            writer.write(current.getName() + ";\n");
+            writer.write(field.getGenericType().getTypeName().replace('$', '.') + " ");
+            writer.write(field.getName() + ";\n");
         }
     }
 
@@ -85,17 +85,17 @@ public class Reflector {
      * @throws IOException
      */
     private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, boolean isAbstract) throws IOException {
-        for (var current: someClass.getDeclaredMethods()) {
+        for (var method: someClass.getDeclaredMethods()) {
             writer.write("\t");
-            if (current.getModifiers() != 0) {
-                writer.write(Modifier.toString(current.getModifiers()) + " ");
+            if (method.getModifiers() != 0) {
+                writer.write(Modifier.toString(method.getModifiers()) + " ");
             }
 
-            writer.write(current.getGenericReturnType().getTypeName().replace('$', '.') + " ");
-            writer.write(current.getName() + "(");
+            writer.write(method.getGenericReturnType().getTypeName().replace('$', '.') + " ");
+            writer.write(method.getName() + "(");
 
-            if (current.getGenericParameterTypes().length > 0) {
-                var parameters = current.getGenericParameterTypes();
+            if (method.getGenericParameterTypes().length > 0) {
+                var parameters = method.getGenericParameterTypes();
                 for (int i = 0; i < parameters.length - 1; i++) {
                     writer.write(parameters[i].getTypeName().replace('$', '.') + " ");
                 }
@@ -103,8 +103,8 @@ public class Reflector {
             }
             writer.write(")");
 
-            if (current.getGenericExceptionTypes().length > 0) {
-                var exceptions = current.getGenericExceptionTypes();
+            if (method.getGenericExceptionTypes().length > 0) {
+                var exceptions = method.getGenericExceptionTypes();
                 for (int i = 0; i < exceptions.length - 1; i++) {
                     writer.write(exceptions[i].getTypeName().replace('$', '.') + " ");
                 }
@@ -113,13 +113,13 @@ public class Reflector {
 
             if (isAbstract) {
                 writer.write(";\n");
-            } else if (current.getReturnType() == null) {
+            } else if (method.getReturnType() == null) {
                 writer.write(" {\n\t\treturn;\n\t}\n");
-            } else if (current.getReturnType() == Boolean.class || current.getReturnType() == boolean.class) {
+            } else if (method.getReturnType() == Boolean.class || method.getReturnType() == boolean.class) {
                 writer.write(" {\n\t\treturn false;\n\t}\n");
-            } else if (current.getReturnType() == Character.class || current.getReturnType() == char.class) {
+            } else if (method.getReturnType() == Character.class || method.getReturnType() == char.class) {
                 writer.write(" {\n\t\treturn '\0';\n\t}\n");
-            } else if (current.getReturnType().isPrimitive()) {
+            } else if (method.getReturnType().isPrimitive()) {
                 writer.write(" {\n\t\treturn 0;\n\t}\n");
             } else {
                 writer.write(" {\n\t\treturn null;\n\t}\n");
