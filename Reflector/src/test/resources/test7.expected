@@ -1,0 +1,13 @@
+public class com.example.Reflector.TestClasses.ClassWithSomeMethods {
+	com.example.Reflector.TestClasses.ClassWithSomeMethods() {
+	}
+	static void method1() {
+		return;
+	}
+	private void method2(java.lang.String java.lang.String) {
+		return;
+	}
+	public int method3(java.lang.Integer) {
+		return 0;
+	}
+}

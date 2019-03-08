@@ -1,0 +1,7 @@
+public class com.example.Reflector.TestClasses.ClassWithSomeFields {
+	java.lang.Integer field1;
+	private java.lang.Integer field2;
+	public static final java.lang.Integer field3;
+	com.example.Reflector.TestClasses.ClassWithSomeFields() {
+	}
+}
