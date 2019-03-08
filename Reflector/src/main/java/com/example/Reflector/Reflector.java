@@ -43,7 +43,7 @@ public class Reflector {
 
         printAllFields(someClass, writer, prefix + "\t");
         writer.write("\n");
-        printAllMethods(someClass, writer, Modifier.isAbstract(someClass.getModifiers()), prefix + "\t");
+        printAllMethods(someClass, writer, prefix + "\t");
         writer.write("}\n");
 
         writer.flush();
@@ -85,7 +85,7 @@ public class Reflector {
      */
     private static void printAllFields(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var field: someClass.getDeclaredFields()) {
-            if (field.getName().matches("^this[$][0-9]+$")) {
+            if (field.isSynthetic()) {
                 continue;
             }
 
@@ -107,8 +107,12 @@ public class Reflector {
      * @param writer output writer
      * @throws IOException
      */
-    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, boolean isAbstract, String prefix) throws IOException {
+    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var method: someClass.getDeclaredMethods()) {
+            if (method.isSynthetic()) {
+                continue;
+            }
+
             writer.write(prefix);
             if (method.getModifiers() != 0) {
                 writer.write(Modifier.toString(method.getModifiers()) + " ");
@@ -134,7 +138,7 @@ public class Reflector {
                 writer.write(exceptions[exceptions.length - 1].getTypeName().replace('$', '.'));
             }
 
-            if (isAbstract) {
+            if (Modifier.isAbstract(method.getModifiers())) {
                 writer.write(";\n");
             } else if (method.getReturnType() == null) {
                 writer.write(" {\n" + prefix + "\treturn;\n" + prefix + "}\n");
