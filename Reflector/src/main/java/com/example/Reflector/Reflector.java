@@ -11,24 +11,31 @@ import java.lang.reflect.Modifier;
 
 public class Reflector {
 
-    public static void main(String[] args) throws IOException {
-        printStructure(TestClass.class);
-    }
-
     public static void printStructure(Class<?> someClass) throws IOException {
         File file = new File("." + File.separator, someClass.getName() + ".java");
         try (var fileOutputStream = new FileOutputStream(file)) {
             var writer = new OutputStreamWriter(fileOutputStream);
 
-            printClassHeading(someClass, writer);
-            writer.write(" {\n\n");
-            printAllFields(someClass, writer);
-            writer.write("\n");
-            printAllMethods(someClass, writer, Modifier.isAbstract(someClass.getModifiers()));
-            writer.write("}\n");
-
-            writer.flush();
+            printClass(someClass, writer, "");
         }
+    }
+
+    /**
+     * Prints structure of a class.
+     * @param someClass class for printing
+     * @param writer output writer
+     * @param prefix prefix of each line of output
+     * @throws IOException
+     */
+    public static void printClass(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
+        printClassHeading(someClass, writer, prefix);
+        writer.write(" {\n\n");
+        printAllFields(someClass, writer, prefix + "\t");
+        writer.write("\n");
+        printAllMethods(someClass, writer, Modifier.isAbstract(someClass.getModifiers()), prefix + "\t");
+        writer.write("}\n");
+
+        writer.flush();
     }
 
     /**
@@ -38,7 +45,8 @@ public class Reflector {
      * @param writer output writer
      * @throws IOException
      */
-    private static void printClassHeading(Class<?> someClass, OutputStreamWriter writer) throws IOException {
+    private static void printClassHeading(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
+        writer.write(prefix);
         writer.write(someClass.toGenericString().replace('$', '.'));
 
         if (someClass.getSuperclass() != null) {
@@ -64,9 +72,9 @@ public class Reflector {
      * @param writer output writer
      * @throws IOException
      */
-    private static void printAllFields(Class<?> someClass, OutputStreamWriter writer) throws IOException {
+    private static void printAllFields(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var field: someClass.getDeclaredFields()) {
-            writer.write("\t");
+            writer.write(prefix);
             if (field.getModifiers() != 0) {
                 writer.write(Modifier.toString(field.getModifiers()));
                 writer.write(" ");
@@ -84,9 +92,9 @@ public class Reflector {
      * @param writer output writer
      * @throws IOException
      */
-    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, boolean isAbstract) throws IOException {
+    private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, boolean isAbstract, String prefix) throws IOException {
         for (var method: someClass.getDeclaredMethods()) {
-            writer.write("\t");
+            writer.write(prefix);
             if (method.getModifiers() != 0) {
                 writer.write(Modifier.toString(method.getModifiers()) + " ");
             }
@@ -114,16 +122,18 @@ public class Reflector {
             if (isAbstract) {
                 writer.write(";\n");
             } else if (method.getReturnType() == null) {
-                writer.write(" {\n\t\treturn;\n\t}\n");
+                writer.write(" {\n" + prefix + "\treturn;\n" + prefix + "}\n");
             } else if (method.getReturnType() == Boolean.class || method.getReturnType() == boolean.class) {
-                writer.write(" {\n\t\treturn false;\n\t}\n");
+                writer.write(" {\n"+ prefix + "\treturn false;\n" + prefix + "}\n");
             } else if (method.getReturnType() == Character.class || method.getReturnType() == char.class) {
-                writer.write(" {\n\t\treturn '\0';\n\t}\n");
+                writer.write(" {\n" + prefix + "\treturn '\0';\n" + prefix + "}\n");
             } else if (method.getReturnType().isPrimitive()) {
-                writer.write(" {\n\t\treturn 0;\n\t}\n");
+                writer.write(" {\n" + prefix + "\treturn 0;\n" + prefix + "}\n");
             } else {
-                writer.write(" {\n\t\treturn null;\n\t}\n");
+                writer.write(" {\n" + prefix + "\treturn null;\n" + prefix + "}\n");
             }
         }
     }
+
+
 }
