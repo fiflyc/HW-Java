@@ -101,14 +101,8 @@ public class DBClient {
         var writer = new OutputStreamWriter(out);
         var connection = DriverManager.getConnection("jdbc:sqlite:" + dbName + ".db");
         var statement = connection.createStatement();
-        ResultSet result;
 
         int command;
-        String name;
-        String newName;
-        String number;
-        String newNumber;
-
         while (true) {
             if (mode == Mode.INTERACTIVE) {
                 writer.write(dbName + "> ");
@@ -120,82 +114,25 @@ public class DBClient {
                 case 0:
                     return;
                 case 1:
-                    name = scanner.next();
-                    number = scanner.next();
-
-                    statement.executeUpdate(
-                            "INSERT INTO Numbers(Number, Name) VALUES (\'" +
-                                    number + "\', \'" +
-                                    name + "\');");
+                    insert(scanner, statement);
                     break;
                 case 2:
-                    name = scanner.next();
-                    result = statement.executeQuery(
-                            "SELECT Number FROM Numbers WHERE Name = \'" + name + "\';");
-
-                    while (result.next()) {
-                        writer.write(result.getString("Number") + " ");
-                    }
-                    writer.write('\n');
-                    writer.flush();
-
+                    numbersByName(scanner, writer, statement);
                     break;
                 case 3:
-                    number = scanner.next();
-                    result = statement.executeQuery(
-                            "SELECT Name FROM Numbers WHERE Number = \'" + number + "\';");
-
-                    while (result.next()) {
-                        writer.write(result.getString("Name") + " ");
-                    }
-                    writer.write('\n');
-                    writer.flush();;
-
+                    namesByNumber(scanner, writer, statement);
                     break;
                 case 4:
-                    name = scanner.next();
-                    number = scanner.next();
-
-                    statement.executeUpdate(
-                            "DELETE FROM Numbers WHERE Name = \'" +
-                                    name + "\' AND Number = \'" +
-                                    number + "\';");
-
+                    remove(scanner, statement);
                     break;
                 case 5:
-                    name = scanner.next();
-                    number = scanner.next();
-                    newName = scanner.next();
-
-                    statement.executeUpdate(
-                            "UPDATE Numbers SET Name = \'" +
-                                    newName + "\' WHERE Name = \'" +
-                                    name + "\' AND Number = \'" +
-                                    number + "\';");
-
+                    changeName(scanner, statement);
                     break;
                 case 6:
-                    name = scanner.next();
-                    number = scanner.next();
-                    newNumber = scanner.next();
-
-                    statement.executeUpdate(
-                            "UPDATE Numbers SET Number = \'" +
-                                    newNumber + "\' WHERE Name = \'" +
-                                    name + "\' AND Number = \'" +
-                                    number + "\';");
-
+                    changeNumber(scanner, statement);
                     break;
                 case 7:
-                    result = statement.executeQuery("SELECT * FROM Numbers;");
-
-                    while (result.next()) {
-                        writer.write(
-                                result.getString("Name") + " " +
-                                result.getString("Number") + "\n");
-                    }
-                    writer.flush();
-
+                    printTable(writer, statement);
                     break;
                 case 8:
                     if (mode == Mode.INTERACTIVE) {
@@ -208,6 +145,89 @@ public class DBClient {
                     break;
             }
         }
+    }
+
+    private static void insert(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+        var name = scanner.next();
+        var number = scanner.next();
+
+        statement.executeUpdate(
+                "INSERT INTO Numbers(Number, Name) VALUES (\'" +
+                        number + "\', \'" +
+                        name + "\');");
+    }
+
+    private static void numbersByName(@NotNull Scanner scanner,
+                                      @NotNull Writer writer,
+                                      @NotNull Statement statement) throws IOException, SQLException {
+        var name = scanner.next();
+        var result = statement.executeQuery(
+                "SELECT Number FROM Numbers WHERE Name = \'" + name + "\';");
+
+        while (result.next()) {
+            writer.write(result.getString("Number") + " ");
+        }
+        writer.write('\n');
+        writer.flush();
+    }
+
+    private static void namesByNumber(@NotNull Scanner scanner,
+                                      @NotNull Writer writer,
+                                      @NotNull Statement statement) throws SQLException, IOException {
+        var number = scanner.next();
+        var result = statement.executeQuery(
+                "SELECT Name FROM Numbers WHERE Number = \'" + number + "\';");
+
+        while (result.next()) {
+            writer.write(result.getString("Name") + " ");
+        }
+        writer.write('\n');
+        writer.flush();
+    }
+
+    private static void remove(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+        var name = scanner.next();
+        var number = scanner.next();
+
+        statement.executeUpdate(
+                "DELETE FROM Numbers WHERE Name = \'" +
+                        name + "\' AND Number = \'" +
+                        number + "\';");
+    }
+
+    private static void changeName(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+        var name = scanner.next();
+        var number = scanner.next();
+        var newName = scanner.next();
+
+        statement.executeUpdate(
+                "UPDATE Numbers SET Name = \'" +
+                        newName + "\' WHERE Name = \'" +
+                        name + "\' AND Number = \'" +
+                        number + "\';");
+    }
+
+    private static void changeNumber(@NotNull Scanner scanner, @NotNull Statement statement) throws SQLException {
+        var name = scanner.next();
+        var number = scanner.next();
+        var newNumber = scanner.next();
+
+        statement.executeUpdate(
+                "UPDATE Numbers SET Number = \'" +
+                        newNumber + "\' WHERE Name = \'" +
+                        name + "\' AND Number = \'" +
+                        number + "\';");
+    }
+
+    private static void printTable(@NotNull Writer writer, @NotNull Statement statement) throws SQLException, IOException {
+        var result = statement.executeQuery("SELECT * FROM Numbers;");
+
+        while (result.next()) {
+            writer.write(
+                    result.getString("Name") + " " +
+                            result.getString("Number") + "\n");
+        }
+        writer.flush();
     }
 
     /**
