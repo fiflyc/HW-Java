@@ -77,6 +77,10 @@ public class Reflector {
      */
     private static void printAllFields(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var field: someClass.getDeclaredFields()) {
+            if (field.getName().matches("^this[$][0-9]+$")) {
+                continue;
+            }
+
             writer.write(prefix);
             if (field.getModifiers() != 0) {
                 writer.write(Modifier.toString(field.getModifiers()));
