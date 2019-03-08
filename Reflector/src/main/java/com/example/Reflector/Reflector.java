@@ -1,8 +1,5 @@
 package com.example.Reflector;
 
-import com.example.Reflector.TestClass.TestClass;
-import com.google.common.base.Defaults;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +27,12 @@ public class Reflector {
     public static void printClass(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         printClassHeading(someClass, writer, prefix);
         writer.write(" {\n\n");
+
+        for (var innerClass: someClass.getDeclaredClasses()) {
+            printClass(innerClass, writer, prefix + "\t");
+            writer.write("\n\n");
+        }
+
         printAllFields(someClass, writer, prefix + "\t");
         writer.write("\n");
         printAllMethods(someClass, writer, Modifier.isAbstract(someClass.getModifiers()), prefix + "\t");
@@ -134,6 +137,4 @@ public class Reflector {
             }
         }
     }
-
-
 }
