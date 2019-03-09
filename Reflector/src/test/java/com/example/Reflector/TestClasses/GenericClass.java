@@ -1,6 +1,6 @@
 package com.example.Reflector.TestClasses;
 
-public class GenericClass<T> {
+public class GenericClass<T extends AbstractClass> {
 
     private T field;
 

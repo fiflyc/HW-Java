@@ -4,10 +4,10 @@ public class com.example.Reflector.TestClasses.ClassWithSomeMethods {
 	static void method1() {
 		return;
 	}
-	private void method2(java.lang.String java.lang.String) {
+	private void method2(java.lang.String<T extends java.lang.Object>, java.lang.String<T extends java.lang.Object>) {
 		return;
 	}
-	public int method3(java.lang.Integer) {
+	public int method3(java.lang.Integer<T extends java.lang.Object>) {
 		return 0;
 	}
 }

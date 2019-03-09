@@ -1,10 +1,14 @@
 package com.example.Reflector;
 
+import com.google.common.reflect.TypeParameter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 /**
  * Contains static methods for generating .java file with class definition.
@@ -56,8 +60,10 @@ public class Reflector {
      * @throws IOException
      */
     private static void printClassHeading(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
-        writer.write(prefix);
-        writer.write(someClass.toGenericString().replace('$', '.'));
+        writer.write(prefix + Modifier.toString(someClass.getModifiers()) + " class ");
+        writer.write(someClass.getCanonicalName().replace('$', '.'));
+
+        printTypeParameters(someClass.getTypeParameters(), writer);
 
         if (someClass.getSuperclass() != Object.class) {
             writer.write(" extends ");
@@ -112,15 +118,9 @@ public class Reflector {
                 continue;
             }
 
-            writer.write(prefix + constructor.getName().replace('$', '.') + "(");
-            if (constructor.getGenericParameterTypes().length > 0) {
-                var parameters = constructor.getGenericParameterTypes();
-                for (int i = 0; i < parameters.length - 1; i++) {
-                    writer.write(parameters[i].getTypeName().replace('$', '.') + " ");
-                }
-                writer.write(parameters[parameters.length - 1].getTypeName().replace('$', '.'));
-            }
-            writer.write(") {\n" + prefix + "}\n");
+            writer.write(prefix + constructor.getName().replace('$', '.'));
+            printArguments(constructor.getGenericParameterTypes(), writer);
+            writer.write(" {\n" + prefix + "}\n");
         }
     }
 
@@ -143,16 +143,8 @@ public class Reflector {
             }
 
             writer.write(method.getGenericReturnType().getTypeName().replace('$', '.') + " ");
-            writer.write(method.getName() + "(");
-
-            if (method.getGenericParameterTypes().length > 0) {
-                var parameters = method.getGenericParameterTypes();
-                for (int i = 0; i < parameters.length - 1; i++) {
-                    writer.write(parameters[i].getTypeName().replace('$', '.') + " ");
-                }
-                writer.write(parameters[parameters.length - 1].getTypeName().replace('$', '.'));
-            }
-            writer.write(")");
+            writer.write(method.getName());
+            printArguments(method.getGenericParameterTypes(), writer);
 
             if (method.getGenericExceptionTypes().length > 0) {
                 var exceptions = method.getGenericExceptionTypes();
@@ -176,5 +168,68 @@ public class Reflector {
                 writer.write(" {\n" + prefix + "\treturn null;\n" + prefix + "}\n");
             }
         }
+    }
+
+    /**
+     * Prints generic type parameters.
+     * @param parameters generic type parameters for printing.
+     * @param writer output writer
+     * @throws IOException
+     */
+    private static void printTypeParameters(TypeVariable[] parameters, OutputStreamWriter writer) throws IOException {
+        if (parameters.length == 0) {
+            return;
+        }
+
+        writer.write("<");
+        for (int i = 0; i < parameters.length - 1; i++) {
+            writer.write(parameters[i].getName());
+
+            var bounds = parameters[i].getBounds();
+            if (bounds.length > 0) {
+                writer.write(" extends ");
+
+                for (int j = 0; j < parameters.length - 1; j++) {
+                    writer.write(bounds[j].getTypeName() + "& ");
+                }
+                writer.write(bounds[bounds.length - 1].getTypeName());
+            }
+
+            writer.write(", ");
+        }
+
+        writer.write(parameters[parameters.length - 1].getName());
+        var bounds = parameters[parameters.length - 1].getBounds();
+        if (bounds.length > 0) {
+            writer.write(" extends ");
+
+            for (int j = 0; j < parameters.length - 1; j++) {
+                writer.write(bounds[j].getTypeName() + "& ");
+            }
+            writer.write(bounds[bounds.length - 1].getTypeName() + ">");
+        }
+    }
+
+    /**
+     * Prints arguments of a function.
+     * @param types array of arguments
+     * @param writer output writer
+     * @throws IOException
+     */
+    private static void printArguments(Type[] types, OutputStreamWriter writer) throws IOException {
+        if (types.length == 0) {
+            writer.write("()");
+            return;
+        }
+
+        writer.write("(");
+        for (int i = 0; i < types.length - 1; i++) {
+            writer.write(types[i].getTypeName().replace('$', '.'));
+            printTypeParameters(types[i].getClass().getTypeParameters(), writer);
+            writer.write(", ");
+        }
+        writer.write(types[types.length - 1].getTypeName().replace('$', '.'));
+        printTypeParameters(types[types.length - 1].getClass().getTypeParameters(), writer);
+        writer.write(")");
     }
 }

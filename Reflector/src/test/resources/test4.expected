@@ -1,6 +1,6 @@
 public class com.example.Reflector.TestClasses.ClassWithInnerClass {
 	private class com.example.Reflector.TestClasses.ClassWithInnerClass.Inner {
-		com.example.Reflector.TestClasses.ClassWithInnerClass.Inner(com.example.Reflector.TestClasses.ClassWithInnerClass) {
+		com.example.Reflector.TestClasses.ClassWithInnerClass.Inner(com.example.Reflector.TestClasses.ClassWithInnerClass<T extends java.lang.Object>) {
 		}
 	}
 	com.example.Reflector.TestClasses.ClassWithInnerClass() {
