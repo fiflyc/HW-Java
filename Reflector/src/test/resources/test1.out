@@ -1,0 +1,5 @@
+public abstract class com.example.Reflector.TestClasses.AbstractClass {
+	com.example.Reflector.TestClasses.AbstractClass() {
+	}
+	public abstract void method();
+}

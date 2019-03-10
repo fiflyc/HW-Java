@@ -1,0 +1,11 @@
+public class com.example.Reflector.TestClasses.GenericClass<T extends com.example.Reflector.TestClasses.AbstractClass> {
+	private T field;
+	com.example.Reflector.TestClasses.GenericClass() {
+	}
+	public void setField(T<D extends java.lang.reflect.GenericDeclaration>) {
+		return;
+	}
+	public T getField() {
+		return null;
+	}
+}

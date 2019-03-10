@@ -1,0 +1,35 @@
+public class com.example.Reflector.TestClasses.BigClass<T extends java.lang.Object> extends com.example.Reflector.TestClasses.Parent implements com.example.Reflector.TestClasses.Interface1, com.example.Reflector.TestClasses.Interface2 {
+	private class com.example.Reflector.TestClasses.BigClass.Inner implements com.example.Reflector.TestClasses.BigClass.Interface3 {
+		private T field;
+		com.example.Reflector.TestClasses.BigClass.Inner(com.example.Reflector.TestClasses.BigClass<T extends java.lang.Object>) {
+		}
+		T get() {
+			return null;
+		}
+		void set(T<D extends java.lang.reflect.GenericDeclaration>) {
+			return;
+		}
+	}
+	private static class com.example.Reflector.TestClasses.BigClass.Nested<T extends java.lang.Object> {
+		com.example.Reflector.TestClasses.BigClass.Nested<T> field1;
+		com.example.Reflector.TestClasses.BigClass.Nested<T> field2;
+		com.example.Reflector.TestClasses.BigClass.Nested() {
+		}
+	}
+	private abstract static interface class com.example.Reflector.TestClasses.BigClass.Interface3 {
+	}
+	private static java.lang.String field1;
+	private java.util.ArrayList<T> field2;
+	private final int CONST;
+	com.example.Reflector.TestClasses.BigClass(java.lang.String<T extends java.lang.Object>, java.util.ArrayList<T>) {
+	}
+	public void removeFirst() {
+		return;
+	}
+	public T getFirst() {
+		return null;
+	}
+	public void print() {
+		return;
+	}
+}

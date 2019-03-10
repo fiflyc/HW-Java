@@ -1,0 +1,4 @@
+public class com.example.Reflector.TestClasses.ClassWithParent extends com.example.Reflector.TestClasses.Parent {
+	com.example.Reflector.TestClasses.ClassWithParent() {
+	}
+}

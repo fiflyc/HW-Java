@@ -1,0 +1,4 @@
+public class com.example.Reflector.TestClasses.ClassImplementsTwoInterfaces implements com.example.Reflector.TestClasses.Interface1, com.example.Reflector.TestClasses.Interface2 {
+	com.example.Reflector.TestClasses.ClassImplementsTwoInterfaces() {
+	}
+}

@@ -1,0 +1,8 @@
+public class com.example.Reflector.TestClasses.ClassWithNestedClass {
+	private static class com.example.Reflector.TestClasses.ClassWithNestedClass.Nested {
+		com.example.Reflector.TestClasses.ClassWithNestedClass.Nested() {
+		}
+	}
+	com.example.Reflector.TestClasses.ClassWithNestedClass() {
+	}
+}
