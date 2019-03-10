@@ -4,12 +4,17 @@ import com.example.Reflector.TestClasses.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
 
-import static com.intellij.util.indexing.impl.DebugAssertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ReflectorTest {
 
@@ -132,5 +137,22 @@ class ReflectorTest {
         assertTrue(FileUtils.contentEquals(
                 new File("./src/test/resources/test11.out"),
                 new File("./src/test/resources/test11.expected")));
+    }
+
+    @Test
+    void printStructure_CompilePrinted_GetOriginalClass() throws IOException, ClassNotFoundException {
+        var writer = new OutputStreamWriter(new FileOutputStream("./src/test/resources/test12.out"));
+
+        Reflector.printClass(BigClass.class, writer, "");
+
+        var compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null,
+                "-d",
+                "./out/test/classes/com/example/Reflector/TestClasses",
+                "./src/test/java/com/example/Reflector/TestClasses/BigClass.java");
+        var classLoader = BigClass.class.getClassLoader();
+        Class<?> cls = Class.forName("com.example.Reflector.TestClasses.BigClass", true, classLoader);
+
+        assertEquals(BigClass.class, cls);
     }
 }

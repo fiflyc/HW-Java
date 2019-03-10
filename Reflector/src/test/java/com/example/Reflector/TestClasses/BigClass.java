@@ -2,7 +2,7 @@ package com.example.Reflector.TestClasses;
 
 import java.util.ArrayList;
 
-class BigClass<T> extends Parent implements Interface1, Interface2 {
+public class BigClass<T> extends Parent implements Interface1, Interface2 {
 
     private static interface Interface3 {
     }
