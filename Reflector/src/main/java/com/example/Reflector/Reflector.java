@@ -1,14 +1,12 @@
 package com.example.Reflector;
 
-import com.google.common.reflect.TypeParameter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * Contains static methods for generating .java file with class definition.
@@ -18,7 +16,6 @@ public class Reflector {
     /**
      * Prints structure of a class.
      * @param someClass class for printing
-     * @throws IOException
      */
     public static void printStructure(Class<?> someClass) throws IOException {
         File file = new File("." + File.separator, someClass.getName() + ".java");
@@ -30,11 +27,186 @@ public class Reflector {
     }
 
     /**
+     * Prints different methods and fields of two classes.
+     * @param a first class
+     * @param b second class
+     */
+    public static void diffClasses(Class<?> a, Class<?> b) throws IOException {
+        diffClasses(a, b, new OutputStreamWriter(System.out));
+    }
+
+    /**
+     * Prints different methods and fields of two classes.
+     * @param a first class
+     * @param b second class
+     * @param writer output writer
+     */
+    public static void diffClasses(Class<?> a, Class<?> b, OutputStreamWriter writer) throws IOException {
+        diffFields(a, b, writer);
+        diffMethods(a, b, writer);
+        writer.flush();
+    }
+
+    /**
+     * Prints different fields of two classes.
+     * @param a first class
+     * @param b second class
+     * @param writer output writer
+     */
+    private static void diffFields(Class<?> a, Class<?> b, OutputStreamWriter writer) throws IOException {
+        var fieldsA = new TreeMap<String, Field>();
+        for (var field: a.getDeclaredFields()) {
+            fieldsA.put(field.getName(), field);
+        }
+        var fieldsB = new TreeMap<String, Field>();
+        for (var field: b.getDeclaredFields()) {
+            fieldsB.put(field.getName(), field);
+        }
+
+        for (var field: b.getDeclaredFields()) {
+            if (fieldsA.containsKey(field.getName())) {
+                var fieldA = fieldsA.get(field.getName());
+
+                if (isEqual(field, fieldA)) {
+                    fieldsB.remove(field.getName());
+                    fieldsA.remove(field.getName());
+                }
+            }
+        }
+
+        var stringBuilder = new StringBuilder();
+        fieldsA.forEach((name, field) -> {
+            stringBuilder.append(field.toGenericString()).append("\n");
+        });
+        fieldsB.forEach((name, field) -> {
+            stringBuilder.append(field.toGenericString()).append("\n");
+        });
+
+        writer.write(stringBuilder.toString());
+    }
+
+    /**
+     * Prints different methods of two classes.
+     * @param a first class
+     * @param b second class
+     * @param writer output writer
+     */
+    private static void diffMethods(Class<?> a, Class<?> b, OutputStreamWriter writer) throws  IOException {
+        var methodsA = new TreeMap<String, ArrayList<Method>>();
+        for (var method: a.getDeclaredMethods()) {
+            if (methodsA.containsKey(method.getName())) {
+                methodsA.get(method.getName()).add(method);
+            } else {
+                methodsA.put(method.getName(), new ArrayList<>());
+                methodsA.get(method.getName()).add(method);
+            }
+        }
+        var methodsB = new TreeMap<String, ArrayList<Method>>();
+        for (var method: b.getDeclaredMethods()) {
+            if (methodsB.containsKey(method.getName())) {
+                methodsB.get(method.getName()).add(method);
+            } else {
+                methodsB.put(method.getName(), new ArrayList<>());
+                methodsB.get(method.getName()).add(method);
+            }
+        }
+
+        var equalsInA = new ArrayList<Method>();
+        var equalsInB = new ArrayList<Method>();
+        for (var method: a.getDeclaredMethods()) {
+            for (var methodB: methodsB.get(method.getName())) {
+                if (isEqual(method, methodB)) {
+                    equalsInA.add(method);
+                    equalsInB.add(methodB);
+                }
+            }
+        }
+        for (var method: equalsInA) {
+            methodsA.get(method.getName()).remove(method);
+        }
+        for (var method: equalsInB) {
+            methodsB.get(method.getName()).remove(method);
+        }
+
+        var stringBuilder = new StringBuilder();
+        methodsA.forEach((name, methods) -> {
+            methods.forEach((method) -> {
+                stringBuilder.append(method.toGenericString()).append("\n");});
+        });
+        methodsB.forEach((name, methods) -> {
+            methods.forEach((method) -> {
+                stringBuilder.append(method.toGenericString()).append("\n");});
+        });
+
+        writer.write(stringBuilder.toString());
+    }
+
+    /**
+     * Compares two fields.
+     */
+    private static boolean isEqual(Field field1, Field field2) {
+        return (
+                field1.getModifiers() == field2.getModifiers() &&
+                field1.getName().equals(field2.getName()) &&
+                isEqual(field1.getType(), field2.getType()) &&
+                isEqual(field1.getGenericType(), field2.getGenericType())
+                );
+    }
+
+    /**
+     * Compares two methods.
+     */
+    private static boolean isEqual(Method method1, Method method2) {
+        return (
+                method1.getModifiers() == method2.getModifiers() &&
+                isEqual(method1.getReturnType(), method2.getReturnType()) &&
+                isEqual(method1.getGenericReturnType(), method2.getGenericReturnType()) &&
+                method1.getName().equals(method2.getName()) &&
+                isEqual(method1.getReturnType(), method2.getReturnType()) &&
+                isEqual(method1.getGenericParameterTypes(), method2.getGenericParameterTypes())
+                );
+    }
+
+    /**
+     * Compares two types.
+     */
+    private static boolean isEqual(Type type1, Type type2) {
+        if (!type1.getTypeName().equals(type2.getTypeName())) {
+            return false;
+        }
+
+        if (type1.getClass().getSuperclass() == Object.class &&
+            type2.getClass().getSuperclass() == Object.class) {
+            return true;
+        }
+
+        return isEqual(type1.getClass().getSuperclass(), type2.getClass().getSuperclass()) &&
+               isEqual(type1.getClass().getInterfaces(), type2.getClass().getInterfaces());
+    }
+
+    /**
+     * Compares two sets of types.
+     * @return true if k-th position of the first set equals the k-th position of the second one for each k
+     */
+    private static boolean isEqual(Type[] types1, Type[] types2) {
+        if (types1.length != types2.length) {
+            return false;
+        }
+
+        for (int i = 0; i < types1.length; i++) {
+            if (!isEqual(types1[i], types2[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Prints structure of a class.
      * @param someClass class for printing
      * @param writer output writer
      * @param prefix prefix of each line of output
-     * @throws IOException
      */
     public static void printClass(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         printClassHeading(someClass, writer, prefix);
@@ -57,7 +229,6 @@ public class Reflector {
      * Also prints all generic types.
      * @param someClass class for printing
      * @param writer output writer
-     * @throws IOException
      */
     private static void printClassHeading(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         writer.write(prefix + Modifier.toString(someClass.getModifiers()) + " class ");
@@ -86,7 +257,6 @@ public class Reflector {
      * Also prints all generic types.
      * @param someClass class for printing
      * @param writer output writer
-     * @throws IOException
      */
     private static void printAllFields(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var field: someClass.getDeclaredFields()) {
@@ -110,7 +280,6 @@ public class Reflector {
      * @param someClass class for printing.
      * @param writer output writer
      * @param prefix prefix of each line of output
-     * @throws IOException
      */
     private static void printAllConstructors(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var constructor: someClass.getDeclaredConstructors()) {
@@ -129,7 +298,6 @@ public class Reflector {
      * Also prints all throwing exception.
      * @param someClass class for printing
      * @param writer output writer
-     * @throws IOException
      */
     private static void printAllMethods(Class<?> someClass, OutputStreamWriter writer, String prefix) throws IOException {
         for (var method: someClass.getDeclaredMethods()) {
@@ -174,7 +342,6 @@ public class Reflector {
      * Prints generic type parameters.
      * @param parameters generic type parameters for printing.
      * @param writer output writer
-     * @throws IOException
      */
     private static void printTypeParameters(TypeVariable[] parameters, OutputStreamWriter writer) throws IOException {
         if (parameters.length == 0) {
@@ -214,7 +381,6 @@ public class Reflector {
      * Prints arguments of a function.
      * @param types array of arguments
      * @param writer output writer
-     * @throws IOException
      */
     private static void printArguments(Type[] types, OutputStreamWriter writer) throws IOException {
         if (types.length == 0) {
