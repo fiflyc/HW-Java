@@ -1,0 +1,10 @@
+public static final int com.example.Reflector.TestClasses.ClassForComparisonA.CONST
+private E com.example.Reflector.TestClasses.ClassForComparisonA.field
+public static final float com.example.Reflector.TestClasses.ClassForComparisonB.CONST
+private E com.example.Reflector.TestClasses.ClassForComparisonB.field
+private static void com.example.Reflector.TestClasses.ClassForComparisonA.method1()
+public E com.example.Reflector.TestClasses.ClassForComparisonA.method2()
+public void com.example.Reflector.TestClasses.ClassForComparisonA.method3(java.util.ArrayList<? extends java.lang.Comparable>)
+private void com.example.Reflector.TestClasses.ClassForComparisonB.method1()
+public E com.example.Reflector.TestClasses.ClassForComparisonB.method2()
+public void com.example.Reflector.TestClasses.ClassForComparisonB.method3(java.util.ArrayList<? extends java.util.function.Function>)

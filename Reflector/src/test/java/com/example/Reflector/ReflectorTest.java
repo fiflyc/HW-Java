@@ -1,11 +1,13 @@
 package com.example.Reflector;
 
+import com.example.Reflector.TestClasses.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
-import com.example.Reflector.TestClasses.*;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import static com.intellij.util.indexing.impl.DebugAssertions.assertTrue;
 
@@ -108,5 +110,27 @@ class ReflectorTest {
         assertTrue(FileUtils.contentEquals(
                 new File("./src/test/resources/test9.out"),
                 new File("./src/test/resources/test9.expected")));
+    }
+
+    @Test
+    void diffClasses_DiffersClasses_AllMethodsAndFieldPrinted() throws IOException, NoSuchMethodException, NoSuchFieldException {
+        var writer = new OutputStreamWriter(new FileOutputStream("./src/test/resources/test10.out"));
+
+        Reflector.diffClasses(ClassForComparisonA.class, ClassForComparisonB.class, writer);
+
+        assertTrue(FileUtils.contentEquals(
+                new File("./src/test/resources/test10.out"),
+                new File("./src/test/resources/test10.expected")));
+    }
+
+    @Test
+    void diffClasses_EqualsClasses_NothingPrinted() throws IOException {
+        var writer = new OutputStreamWriter(new FileOutputStream("./src/test/resources/test11.out"));
+
+        Reflector.diffClasses(ClassForComparisonA.class, ClassForComparisonC.class, writer);
+
+        assertTrue(FileUtils.contentEquals(
+                new File("./src/test/resources/test11.out"),
+                new File("./src/test/resources/test11.expected")));
     }
 }
