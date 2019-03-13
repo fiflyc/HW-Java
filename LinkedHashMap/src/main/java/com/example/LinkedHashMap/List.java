@@ -36,6 +36,9 @@ class List<K, V> {
 
         newNode.prevByOrder = prevByOrder;
         newNode.nextByOrder = null;
+        if (prevByOrder != null) {
+            prevByOrder.nextByOrder = newNode;
+        }
 
         if (head != null) {
             head.prev = newNode;

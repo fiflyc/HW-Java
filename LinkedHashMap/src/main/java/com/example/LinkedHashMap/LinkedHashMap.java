@@ -1,6 +1,5 @@
 package com.example.LinkedHashMap;
 
-import com.twelvemonkeys.imageio.metadata.AbstractEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,10 +8,25 @@ import java.util.Map;
 
 public class LinkedHashMap<K, V> extends AbstractMap {
 
-    static private class Entry<K, V> extends AbstractEntry {
+    static public class Entry<K, V> implements Map.Entry {
 
-        protected Entry(Object o, Object o1) {
-            super(o, o1);
+        private K key;
+        private V value;
+
+        @Override
+        public Object getKey() {
+            return key;
+        }
+
+        @Override
+        public Object getValue() {
+            return value;
+        }
+
+        @Override
+        public Object setValue(Object value) {
+            this.value = (V) value;
+            return value;
         }
     }
 
@@ -40,16 +54,19 @@ public class LinkedHashMap<K, V> extends AbstractMap {
 
             @Override
             public boolean hasNext() {
-                return current == null;
+                return current != null;
             }
 
             @Override
             public E next() {
-                return current.value;
+                var result = current.value;
+                current = current.next;
+                return result;
             }
         }
 
         private Node<E> head;
+        private Node<E> tail;
         private int size;
 
         private Set() {
@@ -63,6 +80,7 @@ public class LinkedHashMap<K, V> extends AbstractMap {
 
             if (head == null) {
                 head = node;
+                tail = node;
                 return;
             }
 
@@ -73,7 +91,7 @@ public class LinkedHashMap<K, V> extends AbstractMap {
 
         @Override
         public Iterator iterator() {
-            return new Iterator(head);
+            return new Iterator(tail);
         }
 
         @Override
@@ -89,8 +107,8 @@ public class LinkedHashMap<K, V> extends AbstractMap {
 
     private List[] container;
     private int size;
-    private List.Node firstByOrder;
-    private List.Node lastByOrder;
+    private List.Node<K, V> firstByOrder;
+    private List.Node<K, V> lastByOrder;
     private static final int DEFAULT_CONTAINER_LENGTH = 10000;
 
     LinkedHashMap() {
@@ -124,16 +142,25 @@ public class LinkedHashMap<K, V> extends AbstractMap {
         }
 
         lastByOrder = container[getHash((K) key)].add(key, value, lastByOrder);
+        if (firstByOrder == null) {
+            firstByOrder = lastByOrder;
+        }
 
         return result;
     }
 
     @Override
     public V remove(@NotNull Object key) {
+        if (key.equals(firstByOrder.getKey())) {
+            firstByOrder = firstByOrder.nextByOrder();
+        }
+
         Object result = container[getHash((K) key)].find(key);
         if (result != null) {
             size--;
         }
+
+        container[getHash((K) key)].remove(key);
 
         return (V) result;
     }
@@ -144,10 +171,13 @@ public class LinkedHashMap<K, V> extends AbstractMap {
     }
 
     @Override
-    public java.util.Set entrySet() {
+    public java.util.Set<Entry<K, V>> entrySet() {
         var set = new Set<Entry<K, V>>();
-        for (var current = firstByOrder; current != null; current = current.nextByOrder()) {
-            set.put(new Entry<>(current.getKey(), current.getValue()));
+        for (List.Node<K, V> current = firstByOrder; current != null; current = current.nextByOrder()) {
+            Entry<K, V> entry = new Entry<K, V>();
+            entry.value = current.getValue();
+            entry.key = current.getKey();
+            set.put(entry);
         }
 
         return set;
