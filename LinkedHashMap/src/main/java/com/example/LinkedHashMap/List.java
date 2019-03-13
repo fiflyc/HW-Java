@@ -59,7 +59,7 @@ public class List<K, V> {
     }
 
     /** Returns the value corresponding to the key. */
-    public Object find(String key) {
+    public Object find(K key) {
         Node current = head;
         Object result = null;
 
