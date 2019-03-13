@@ -1,29 +1,50 @@
 package com.example.LinkedHashMap;
 
-public class List<K, V> {
+class List<K, V> {
 
     /** Node of the List. */
-    static private class Node<K, V> {
+    static class Node<K, V> {
         private K key;
         private V value;
         private Node next;
         private Node prev;
+        private Node nextByOrder;
+        private Node prevByOrder;
+
+        Node<K, V> nextByOrder() {
+            return nextByOrder;
+        }
+
+        K getKey() {
+            return key;
+        }
+
+        V getValue() {
+            return value;
+        }
     }
 
     /** The head of the List. */
     private Node head;
 
     /** Adds pair (key, value) at the tail of the List. */
-    public void add(K key, V value) {
+    public Node add(K key, V value, Node prevByOrder) {
         Node newNode = new Node();
         newNode.key = key;
         newNode.value = value;
         newNode.next = head;
+
+        newNode.prevByOrder = prevByOrder;
+        newNode.nextByOrder = null;
+
         if (head != null) {
             head.prev = newNode;
         }
+
         newNode.prev = null;
         head = newNode;
+
+        return newNode;
     }
 
     /**
@@ -43,6 +64,12 @@ public class List<K, V> {
                 }
                 if (current.next != null) {
                     current.next.prev = current.prev;
+                }
+                if (current.nextByOrder != null) {
+                    current.nextByOrder.prevByOrder = current.prevByOrder;
+                }
+                if (current.prevByOrder != null) {
+                    current.prevByOrder.nextByOrder = current.nextByOrder;
                 }
 
                 if (current == head) {
