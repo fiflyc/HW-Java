@@ -3,11 +3,41 @@ package com.example.QSort;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class QSort {
 
     public static void main(String[] args) {
+        var array = new ArrayList<Integer>();
+        array.add(0);
+        array.add(-1);
+        var random = new Random();
 
+        long sortTime = checkSortTime(array);
+        long parallelSortTime = checkParallelSortTime(array);
+        while (parallelSortTime >= sortTime) {
+            for (int i = 0; i < array.size() / 2; i++) {
+                array.add(random.nextInt());
+            }
+            sortTime = checkSortTime(array);
+            parallelSortTime = checkParallelSortTime(array);
+        }
+
+        System.out.println("When array size is " + array.size() + " threads win.");
+    }
+
+    private static <E extends Comparable<? super E>> long checkSortTime(@NotNull ArrayList<E> array) {
+        long start = System.nanoTime();
+        sort(array, 0, array.size() - 1);
+        long finish = System.nanoTime();
+        return finish - start;
+    }
+
+    private static <E extends Comparable<? super E>> long checkParallelSortTime(@NotNull ArrayList<E> array) {
+        long start = System.nanoTime();
+        parallelSort(array, 0, array.size() - 1, 8);
+        long finish = System.nanoTime();
+        return finish - start;
     }
 
     public static <E extends Comparable<? super E>> void sort(@NotNull ArrayList<E> array, int first, int last) {
