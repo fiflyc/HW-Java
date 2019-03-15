@@ -5,8 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class contains QSort realization.
+ * Also contains method main for get some statistic information.
+ */
 public class QSort {
 
+    /** Finds array size when several threads work faster. */
     public static void main(String[] args) {
         var array = new ArrayList<Integer>();
         array.add(0);
@@ -26,6 +31,11 @@ public class QSort {
         System.out.println("When array size is " + array.size() + " threads win.");
     }
 
+    /**
+     * Checks qsort work time.
+     * @param array for sorting
+     * @return qsort work time
+     */
     private static <E extends Comparable<? super E>> long checkSortTime(@NotNull ArrayList<E> array) {
         long start = System.nanoTime();
         sort(array, 0, array.size() - 1);
@@ -33,6 +43,11 @@ public class QSort {
         return finish - start;
     }
 
+    /**
+     * Checks parallel qsort work time.
+     * @param array for sorting
+     * @return parallel qsort work time
+     */
     private static <E extends Comparable<? super E>> long checkParallelSortTime(@NotNull ArrayList<E> array) {
         long start = System.nanoTime();
         parallelSort(array, 0, array.size() - 1, 8);
@@ -40,6 +55,7 @@ public class QSort {
         return finish - start;
     }
 
+    /** Sorts array. */
     public static <E extends Comparable<? super E>> void sort(@NotNull ArrayList<E> array, int first, int last) {
         if (first < 0 || last >= array.size() || first >= last) {
             return;
@@ -50,6 +66,7 @@ public class QSort {
         sort(array, middle + 1, last);
     }
 
+    /** Sorts array using several threads. */
     public static <E extends Comparable<? super E>> void parallelSort(@NotNull ArrayList<E> array, int first, int last, int threads) {
         if (threads <= 1) {
             sort(array, first, last);
@@ -63,6 +80,7 @@ public class QSort {
         thread2.start();
     }
 
+    /** Partition algorithm. */
     private static <E extends Comparable<? super E>> int partition(@NotNull ArrayList<E> array, int first, int last) {
         if (first < 0 || last >= array.size() || first > last) {
             return -1;
