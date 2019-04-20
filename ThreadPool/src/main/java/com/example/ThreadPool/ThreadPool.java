@@ -76,6 +76,9 @@ public class ThreadPool {
     /** All working threads. */
     private ArrayList<Thread> threads;
 
+    /** True if shutdown() method was called. */
+    private volatile Boolean isValid;
+
     /** A new task for execution. */
     @Nullable private MyFuture newFuture;
 
@@ -93,6 +96,7 @@ public class ThreadPool {
      * @param n number of working threads
      */
     public ThreadPool(int n) {
+        isValid = true;
         threadsMutex = new Object();
         submitMutex = new Object();
         threads = new ArrayList<>();
@@ -143,11 +147,17 @@ public class ThreadPool {
 
     /**
      * Adds a new task in a thread pool.
-     * Undefined behavior if send task after calling shutdown().
      * @param task task for execution
+     * @throws IllegalStateException if called after shutdown()
      * @return a LightFuture object with an information about task execution
      */
-    @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) {
+    @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) throws IllegalStateException {
+        synchronized (isValid) {
+            if (!isValid) {
+                throw new IllegalStateException("ThreadPool: all threads was interrupted, because shutdown() has been already called.");
+            }
+        }
+
         var future = new MyFuture<R>();
 
         synchronized (submitMutex) {
@@ -172,6 +182,10 @@ public class ThreadPool {
     void shutdown() {
         for (var thread: threads) {
             thread.interrupt();
+        }
+
+        synchronized (isValid) {
+            isValid = false;
         }
     }
 }
