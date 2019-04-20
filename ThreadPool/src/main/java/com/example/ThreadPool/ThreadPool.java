@@ -15,6 +15,9 @@ public class ThreadPool {
         /** Readiness of a task result. */
         private volatile boolean isReady;
 
+        /** Was a task fallen by exception. */
+        private volatile Exception exception;
+
         /** A result of executing. */
         private volatile R result;
 
@@ -23,6 +26,7 @@ public class ThreadPool {
 
         MyFuture() {
             isReady = false;
+            exception = null;
             result = null;
             taskReadyMutex = new Object();
         }
@@ -38,12 +42,14 @@ public class ThreadPool {
         public R get() throws LightExecutionException {
             synchronized (taskReadyMutex) {
                 while (result == null) {
+                    if (exception != null) {
+                        throw new LightExecutionException(exception.getMessage());
+                    }
+
                     try {
                         taskReadyMutex.wait();
                     } catch (InterruptedException e) {
                         // do nothing
-                    } catch (Exception e) {
-                        throw new LightExecutionException(e.getMessage());
                     }
                 }
 
@@ -119,7 +125,11 @@ public class ThreadPool {
                     }
 
                     synchronized (future.taskReadyMutex) {
-                        future.result = task.get();
+                        try {
+                            future.result = task.get();
+                        } catch (Exception e) {
+                            future.exception = e;
+                        }
                         future.isReady = true;
 
                         future.taskReadyMutex.notify();
