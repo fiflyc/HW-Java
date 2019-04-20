@@ -71,25 +71,27 @@ public class ThreadPool {
     private ArrayList<Thread> threads;
 
     /** A new task for execution. */
-    @Nullable private Supplier newTask;
-
-    /** A mutex for newTask. */
-    private final Object taskMutex;
-
-    /** A LightFuture object with information about the new task. */
     @Nullable private MyFuture newFuture;
 
-    /** A mutex for newFuture. */
-    private final Object futureMutex;
+    /** A new LightFuture object corresponding a new task. */
+    @Nullable private Supplier newTask;
+
+    /** A mutex for threads. */
+    private final Object threadsMutex;
+
+    /** A mutex for task sender (submit() method). */
+    private final Object submitMutex;
 
     /**
      * Creates a new thread pool.
      * @param n number of working threads
      */
     public ThreadPool(int n) {
-        taskMutex = new Object();
-        futureMutex = new Object();
+        threadsMutex = new Object();
+        submitMutex = new Object();
         threads = new ArrayList<>();
+        newFuture = null;
+        newTask = null;
 
         for (int i = 0; i < n; i++) {
             threads.add(new Thread(() -> {
@@ -97,77 +99,69 @@ public class ThreadPool {
                     Supplier task;
                     MyFuture future;
 
-                    synchronized (taskMutex) {
-                        while (newTask == null) {
+                    synchronized (threadsMutex) {
+                        while (newTask == null || newFuture == null) {
                             try {
-                                taskMutex.wait();
+                                threadsMutex.wait();
                             } catch (InterruptedException e) {
                                 return;
                             }
                         }
+
                         task = newTask;
+                        future = newFuture;
                         newTask = null;
-                        taskMutex.notify();
-
-                        synchronized (futureMutex) {
-                            while (newFuture != null) {
-                                try {
-                                    futureMutex.wait();
-                                } catch (InterruptedException e) {
-                                    return;
-                                }
-                            }
-
-                            newFuture = new MyFuture();
-                            future = newFuture;
-                        }
-                        futureMutex.notify();
+                        newFuture = null;
                     }
 
-                    Object result = task.get();
+                    synchronized (submitMutex) {
+                        submitMutex.notify();
+                    }
+
                     synchronized (future.taskReadyMutex) {
-                        future.result = result;
+                        future.result = task.get();
                         future.isReady = true;
-                        future.taskReadyMutex.notifyAll();
+
+                        future.taskReadyMutex.notify();
                     }
                 }
             }));
+
+            threads.get(i).start();
         }
     }
 
     /**
      * Adds a new task in a thread pool.
+     * Undefined behavior if send task after calling shutdown().
      * @param task task for execution
      * @return a LightFuture object with an information about task execution
      */
     @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) {
-        synchronized (taskMutex) {
-            while (newTask != null) {
+        var future = new MyFuture<R>();
+
+        synchronized (submitMutex) {
+            while (newTask != null || newFuture != null) {
                 try {
-                    taskMutex.wait();
+                    submitMutex.wait();
                 } catch (InterruptedException e) {
                     // do nothing
                 }
             }
             newTask = task;
+            newFuture = future;
         }
-        taskMutex.notify();
 
-        LightFuture result;
-        synchronized (futureMutex) {
-            while (newFuture == null) {
-                try {
-                    futureMutex.wait();
-                } catch (InterruptedException e) {
-                    // do nothing
-                }
-            }
-
-            result = newFuture;
-            newFuture = null;
+        synchronized (threadsMutex) {
+            threadsMutex.notify();
         }
-        futureMutex.notify();
 
-        return result;
+        return future;
+    }
+
+    void shutdown() {
+        for (var thread: threads) {
+            thread.interrupt();
+        }
     }
 }
