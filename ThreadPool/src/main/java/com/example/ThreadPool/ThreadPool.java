@@ -183,7 +183,7 @@ public class ThreadPool {
     }
 
     /** Interrupts all threads in a thread pool. */
-    void shutdown() {
+    public void shutdown() {
         for (var thread: threads) {
             thread.interrupt();
         }
