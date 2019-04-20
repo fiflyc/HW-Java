@@ -31,6 +31,7 @@ public class ThreadPool {
             taskReadyMutex = new Object();
         }
 
+        /** {@link LightFuture#isReady()} */
         @Override
         public boolean isReady() {
             synchronized (taskReadyMutex) {
@@ -38,6 +39,7 @@ public class ThreadPool {
             }
         }
 
+        /** {@link LightFuture#get()} */
         @Override
         public R get() throws LightExecutionException {
             synchronized (taskReadyMutex) {
@@ -57,6 +59,7 @@ public class ThreadPool {
             }
         }
 
+        /** {@link LightFuture#thenApply(Function)} ()} */
         @Override
         public <T> LightFuture<T> thenApply(Function<R, T> function) {
             synchronized (taskReadyMutex) {
@@ -179,6 +182,7 @@ public class ThreadPool {
         return future;
     }
 
+    /** Interrupts all threads in a thread pool. */
     void shutdown() {
         for (var thread: threads) {
             thread.interrupt();
