@@ -16,10 +16,10 @@ public class ThreadPool {
         private volatile boolean isReady;
 
         /** Was a task fallen by exception. */
-        private volatile Exception exception;
+        @Nullable private volatile Exception exception;
 
         /** A result of executing. */
-        private volatile R result;
+        @Nullable private volatile R result;
 
         /** A mutex for task ending informing. */
         private final Object taskReadyMutex;
@@ -61,7 +61,7 @@ public class ThreadPool {
 
         /** {@link LightFuture#thenApply(Function)} ()} */
         @Override
-        public <T> LightFuture<T> thenApply(Function<R, T> function) {
+        public <T> LightFuture<T> thenApply(@NotNull Function<R, T> function) {
             synchronized (taskReadyMutex) {
                 while (result == null) {
                     try {
