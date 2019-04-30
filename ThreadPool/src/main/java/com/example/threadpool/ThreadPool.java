@@ -1,4 +1,4 @@
-package com.example.ThreadPool;
+package com.example.threadpool;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -157,7 +157,7 @@ public class ThreadPool {
     @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) throws IllegalStateException {
         synchronized (isValid) {
             if (!isValid) {
-                throw new IllegalStateException("ThreadPool: all threads was interrupted, because shutdown() has been already called.");
+                throw new IllegalStateException("threadpool: all threads was interrupted, because shutdown() has been already called.");
             }
         }
 

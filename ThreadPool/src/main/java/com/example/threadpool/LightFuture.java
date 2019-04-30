@@ -1,4 +1,4 @@
-package com.example.ThreadPool;
+package com.example.threadpool;
 
 import org.jetbrains.annotations.NotNull;
 

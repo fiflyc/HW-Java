@@ -1,4 +1,4 @@
-package com.example.ThreadPool;
+package com.example.threadpool;
 
 public class LightExecutionException extends Exception {
 
