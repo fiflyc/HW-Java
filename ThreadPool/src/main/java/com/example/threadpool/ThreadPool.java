@@ -13,7 +13,7 @@ public class ThreadPool {
     private class MyFuture<R> implements LightFuture<R> {
 
         /** Readiness of a task result. */
-        private volatile boolean isReady;
+        private boolean isReady;
 
         /** Was a task fallen by exception. */
         @Nullable private volatile Exception exception;
@@ -34,9 +34,7 @@ public class ThreadPool {
         /** {@link LightFuture#isReady()} */
         @Override
         public boolean isReady() {
-            synchronized (taskReadyMutex) {
-                return isReady;
-            }
+            return isReady;
         }
 
         /** {@link LightFuture#get()} */
@@ -61,7 +59,7 @@ public class ThreadPool {
 
         /** {@link LightFuture#thenApply(Function)} ()} */
         @Override
-        public <T> LightFuture<T> thenApply(@NotNull Function<R, T> function) {
+        public <T> LightFuture<T> thenApply(@NotNull Function<? super R, T> function) {
             synchronized (taskReadyMutex) {
                 while (result == null) {
                     try {
@@ -107,45 +105,49 @@ public class ThreadPool {
         newTask = null;
 
         for (int i = 0; i < n; i++) {
-            threads.add(new Thread(() -> {
-                while (true) {
-                    Supplier task;
-                    MyFuture future;
-
-                    synchronized (threadsMutex) {
-                        while (newTask == null || newFuture == null) {
-                            try {
-                                threadsMutex.wait();
-                            } catch (InterruptedException e) {
-                                return;
-                            }
-                        }
-
-                        task = newTask;
-                        future = newFuture;
-                        newTask = null;
-                        newFuture = null;
-                    }
-
-                    synchronized (submitMutex) {
-                        submitMutex.notify();
-                    }
-
-                    synchronized (future.taskReadyMutex) {
-                        try {
-                            future.result = task.get();
-                        } catch (Exception e) {
-                            future.exception = e;
-                        }
-                        future.isReady = true;
-
-                        future.taskReadyMutex.notify();
-                    }
-                }
-            }));
-
+            threads.add(createNewThread());
             threads.get(i).start();
         }
+    }
+
+    /** Creates a new thread. */
+    private Thread createNewThread() {
+        return new Thread(() -> {
+            while (true) {
+                Supplier task;
+                MyFuture future;
+
+                synchronized (threadsMutex) {
+                    while (newTask == null || newFuture == null) {
+                        try {
+                            threadsMutex.wait();
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                    }
+
+                    task = newTask;
+                    future = newFuture;
+                    newTask = null;
+                    newFuture = null;
+                }
+
+                synchronized (submitMutex) {
+                    submitMutex.notify();
+                }
+
+                synchronized (future.taskReadyMutex) {
+                    try {
+                        future.result = task.get();
+                    } catch (Exception e) {
+                        future.exception = e;
+                    }
+                    future.isReady = true;
+
+                    future.taskReadyMutex.notify();
+                }
+            }
+        });
     }
 
     /**
@@ -155,10 +157,8 @@ public class ThreadPool {
      * @return a LightFuture object with an information about task execution
      */
     @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) throws IllegalStateException {
-        synchronized (isValid) {
-            if (!isValid) {
-                throw new IllegalStateException("threadpool: all threads was interrupted, because shutdown() has been already called.");
-            }
+        if (!isValid) {
+            throw new IllegalStateException("threadpool: all threads was interrupted, because shutdown() has been already called.");
         }
 
         var future = new MyFuture<R>();
@@ -183,13 +183,11 @@ public class ThreadPool {
     }
 
     /** Interrupts all threads in a thread pool. */
-    public void shutdown() {
+    public void forceShutdown() {
         for (var thread: threads) {
             thread.interrupt();
         }
 
-        synchronized (isValid) {
-            isValid = false;
-        }
+        isValid = false;
     }
 }

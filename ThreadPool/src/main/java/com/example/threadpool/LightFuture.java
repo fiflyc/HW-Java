@@ -22,5 +22,5 @@ public interface LightFuture<R> {
      * @param function a function for application
      * @return a new task executing the function
      */
-    @NotNull <T> LightFuture<T> thenApply(@NotNull Function<R, T> function);
+    @NotNull <T> LightFuture<T> thenApply(@NotNull Function<? super R, T> function);
 }

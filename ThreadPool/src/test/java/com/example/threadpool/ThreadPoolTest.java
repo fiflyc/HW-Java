@@ -20,7 +20,7 @@ public class ThreadPoolTest {
 
     @AfterEach
     void shutdown() {
-        threadPool.shutdown();
+        threadPool.forceShutdown();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ThreadPoolTest {
 
     @Test
     void submit_AfterShutdown_IllegalStateException() {
-        threadPool.shutdown();
+        threadPool.forceShutdown();
 
         assertThrows(IllegalStateException.class, () -> threadPool.submit(() -> 1));
     }
