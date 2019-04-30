@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +43,24 @@ public class ThreadPoolTest {
         future = future.thenApply((x) -> x * 10);
 
         assertEquals(Integer.valueOf(10), future.get());
+    }
+
+    @Test
+    void thenApply_SeveralFunctions_AllTasksExecuted() throws LightExecutionException {
+        var numberOfThreads = new AtomicInteger(0);
+        Supplier<Integer> task = () -> {
+            numberOfThreads.getAndIncrement();
+            return 0;
+        };
+        Function<Integer, Integer> function = (x) -> {
+            numberOfThreads.getAndIncrement();
+            return 0;
+        };
+
+        var future = threadPool.submit(task).thenApply(function).thenApply(function).thenApply(function);
+        future.get();
+
+        assertTrue(numberOfThreads.compareAndSet(4, 4));
     }
 
     @Test
