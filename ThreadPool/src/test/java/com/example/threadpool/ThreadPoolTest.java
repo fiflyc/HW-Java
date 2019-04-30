@@ -75,7 +75,7 @@ public class ThreadPoolTest {
         for (int i = 0; i < 30; i++) {
             int j = i;
             threadPool.submit(() -> {
-                numberOfThreads.getAndSet(numberOfThreads.get() + 1);
+                numberOfThreads.getAndIncrement();
 
                 try {
                     Thread.currentThread().join();
