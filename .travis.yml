@@ -7,4 +7,5 @@ env:
 - PROJECT_DIR=HashTable
 - PROJECT_DIR=Trie
 - PROJECT_DIR=MyTreeSet
+- PROJECT_DIR=ThreadPool
 script: cd $PROJECT_DIR && ./gradlew check
