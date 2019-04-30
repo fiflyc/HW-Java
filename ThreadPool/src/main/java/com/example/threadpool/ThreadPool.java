@@ -3,6 +3,7 @@ package com.example.threadpool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -10,66 +11,87 @@ import java.util.function.Supplier;
 /** Thread Pool. */
 public class ThreadPool {
 
-    private class MyFuture<R> implements LightFuture<R> {
+    /** A task for executing. */
+    private static class Task<T, R> {
 
-        /** Readiness of a task result. */
-        private boolean isReady;
+        private class MyFuture implements LightFuture<R> {
 
-        /** Was a task fallen by exception. */
-        @Nullable private volatile Exception exception;
+            /** Readiness of a task result. */
+            private boolean isReady;
 
-        /** A result of executing. */
-        @Nullable private volatile R result;
+            /** Was a task fallen by exception. */
+            @Nullable private volatile Exception exception;
 
-        /** A mutex for task ending informing. */
-        private final Object taskReadyMutex;
+            /** A result of executing. */
+            @Nullable private volatile R result;
 
-        MyFuture() {
-            isReady = false;
-            exception = null;
-            result = null;
-            taskReadyMutex = new Object();
-        }
+            /** A mutex for task ending informing. */
+            private final Object taskReadyMutex;
 
-        /** {@link LightFuture#isReady()} */
-        @Override
-        public boolean isReady() {
-            return isReady;
-        }
+            MyFuture() {
+                isReady = false;
+                exception = null;
+                result = null;
+                taskReadyMutex = new Object();
+            }
 
-        /** {@link LightFuture#get()} */
-        @Override
-        public R get() throws LightExecutionException {
-            synchronized (taskReadyMutex) {
-                while (result == null) {
-                    if (exception != null) {
-                        throw new LightExecutionException(exception.getMessage());
+            /** {@link LightFuture#isReady()} */
+            @Override
+            public boolean isReady() {
+                return isReady;
+            }
+
+            /** {@link LightFuture#get()} */
+            @Override
+            public R get() throws LightExecutionException {
+                synchronized (taskReadyMutex) {
+                    while (result == null) {
+                        if (exception != null) {
+                            throw new LightExecutionException(exception.getMessage());
+                        }
+
+                        try {
+                            taskReadyMutex.wait();
+                        } catch (InterruptedException e) {
+                            // do nothing
+                        }
                     }
 
-                    try {
-                        taskReadyMutex.wait();
-                    } catch (InterruptedException e) {
-                        // do nothing
+                    return result;
+                }
+            }
+
+            /** {@link LightFuture#thenApply(Function)} ()} */
+            public <E> LightFuture<E> thenApply(@NotNull Function<? super R, E> function) {
+                synchronized (taskReadyMutex) {
+                    Task.this.nextTask = new Task<>(function, Task.this.queue);
+                    if (result != null) {
+                        Task.this.nextTask.argument = result;
+                        Task.this.nextTask.submit();
                     }
                 }
-
-                return result;
+                return (LightFuture<E>) nextTask.future;
             }
         }
 
-        /** {@link LightFuture#thenApply(Function)} ()} */
-        @Override
-        public <T> LightFuture<T> thenApply(@NotNull Function<? super R, T> function) {
-            synchronized (taskReadyMutex) {
-                while (result == null) {
-                    try {
-                        taskReadyMutex.wait();
-                    } catch (InterruptedException e) {
-                        // do nothing
-                    }
-                }
+        @Nullable private T argument;
+        @NotNull private Function<? super T, R> function;
+        @NotNull private MyFuture future;
+        @Nullable private Task<R, ?> nextTask;
 
-                return ThreadPool.this.submit(() -> function.apply(result));
+        /** For submitting myself to the ThreadPool. */
+        @NotNull private final ArrayDeque<Task> queue;
+
+        private Task(@NotNull Function<? super T, R> function, @NotNull ArrayDeque<Task> queue) {
+            this.function = function;
+            future = this.new MyFuture();
+            this.queue = queue;
+        }
+
+        private void submit() {
+            synchronized (queue) {
+                queue.addLast(this);
+                queue.notify();
             }
         }
     }
@@ -80,17 +102,8 @@ public class ThreadPool {
     /** True if shutdown() method was called. */
     private volatile Boolean isValid;
 
-    /** A new task for execution. */
-    @Nullable private MyFuture newFuture;
-
-    /** A new LightFuture object corresponding a new task. */
-    @Nullable private Supplier newTask;
-
-    /** A mutex for threads. */
-    private final Object threadsMutex;
-
-    /** A mutex for task sender (submit() method). */
-    private final Object submitMutex;
+    /** New tasks for executing. */
+    @NotNull private final ArrayDeque<Task> newTasks;
 
     /**
      * Creates a new thread pool.
@@ -98,11 +111,8 @@ public class ThreadPool {
      */
     public ThreadPool(int n) {
         isValid = true;
-        threadsMutex = new Object();
-        submitMutex = new Object();
         threads = new ArrayList<>();
-        newFuture = null;
-        newTask = null;
+        newTasks = new ArrayDeque<>();
 
         for (int i = 0; i < n; i++) {
             threads.add(createNewThread());
@@ -114,37 +124,39 @@ public class ThreadPool {
     private Thread createNewThread() {
         return new Thread(() -> {
             while (true) {
-                Supplier task;
-                MyFuture future;
+                Task task;
 
-                synchronized (threadsMutex) {
-                    while (newTask == null || newFuture == null) {
+                synchronized (newTasks) {
+                    while (newTasks.size() == 0) {
                         try {
-                            threadsMutex.wait();
+                            newTasks.wait();
                         } catch (InterruptedException e) {
                             return;
                         }
                     }
 
-                    task = newTask;
-                    future = newFuture;
-                    newTask = null;
-                    newFuture = null;
+                    task = newTasks.removeFirst();
                 }
 
-                synchronized (submitMutex) {
-                    submitMutex.notify();
-                }
-
-                synchronized (future.taskReadyMutex) {
+                synchronized (task.future.taskReadyMutex) {
                     try {
-                        future.result = task.get();
+                        task.future.result = task.function.apply(task.argument);
                     } catch (Exception e) {
-                        future.exception = e;
+                        task.future.exception = e;
                     }
-                    future.isReady = true;
+                    task.future.isReady = true;
 
-                    future.taskReadyMutex.notify();
+                    task.future.taskReadyMutex.notify();
+                }
+
+                if (task.nextTask != null) {
+                    task.nextTask.argument = task.future.result;
+
+                    synchronized (newTasks) {
+                        newTasks.addLast(task.nextTask);
+                        newTasks.notify();
+                    }
+                } else {
                 }
             }
         });
@@ -153,33 +165,18 @@ public class ThreadPool {
     /**
      * Adds a new task in a thread pool.
      * @param task task for execution
-     * @throws IllegalStateException if called after shutdown()
+     * @throws IllegalStateException if called after forceShutdown()
      * @return a LightFuture object with an information about task execution
      */
     @NotNull public <R> LightFuture<R> submit(@NotNull Supplier<R> task) throws IllegalStateException {
         if (!isValid) {
-            throw new IllegalStateException("threadpool: all threads was interrupted, because shutdown() has been already called.");
+            throw new IllegalStateException("Thread Pool: all threads was interrupted, because forceShutdown() has been already called.");
         }
 
-        var future = new MyFuture<R>();
+        var newTask = new Task<>((o) -> task.get(), newTasks);
+        newTask.submit();
 
-        synchronized (submitMutex) {
-            while (newTask != null || newFuture != null) {
-                try {
-                    submitMutex.wait();
-                } catch (InterruptedException e) {
-                    // do nothing
-                }
-            }
-            newTask = task;
-            newFuture = future;
-        }
-
-        synchronized (threadsMutex) {
-            threadsMutex.notify();
-        }
-
-        return future;
+        return newTask.future;
     }
 
     /** Interrupts all threads in a thread pool. */
