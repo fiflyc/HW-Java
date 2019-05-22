@@ -75,4 +75,8 @@ class Cannon {
     double getYPos() {
         return yPos;
     }
+
+    double getAngle() {
+        return angle;
+    }
 }

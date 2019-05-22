@@ -47,4 +47,19 @@ class Terrain {
 
         return part * segmentHeight + yPoints[segment];
     }
+
+    double findIntersection(double x, double y, double angle) {
+        double xV = 40 * Math.cos(angle);
+        double yV = -40 * Math.sin(angle);
+        final double G = 10;
+
+        double t = 1;
+        for (; heightFromWidth(x + xV * t) > y + yV * t + G * t * t / 2; t++) {
+            if (x + xV * t > width || x + xV * t < 0) {
+                return -1;
+            }
+        }
+
+        return x + xV * t;
+    }
 }

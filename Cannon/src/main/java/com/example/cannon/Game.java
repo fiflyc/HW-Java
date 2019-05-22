@@ -4,7 +4,10 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -54,6 +57,23 @@ public class Game extends Application {
                     cannon.changeAngle(-Math.PI / 12);
                     break;
                 case ENTER:
+                    double xPos = terrain.findIntersection(cannon.getXPos(), cannon.getYPos(), cannon.getAngle());
+                    if (xPos == -1) {
+                        break;
+                    }
+                    if (Math.abs(xPos - xTarget) < 20) {
+                        var text = new Text();
+                        text.setX(50);
+                        text.setY(50);
+                        text.setFont(Font.font("Arial", 20));
+                        text.setFill(Color.ORANGERED);
+                        text.setText("YOU WIN");
+                        group.getChildren().add(text);
+                        group.getChildren().remove(target);
+                        group.getChildren().add(new Circle(xPos, terrain.heightFromWidth(xPos), 10, Color.CADETBLUE));
+                    } else {
+                        group.getChildren().add(new Circle(xPos, terrain.heightFromWidth(xPos), 10, Color.CADETBLUE));
+                    }
                     break;
             }
         });
