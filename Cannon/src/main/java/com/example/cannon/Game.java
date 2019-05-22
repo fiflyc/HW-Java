@@ -1,16 +1,14 @@
 package com.example.cannon;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class Game extends Application implements EventHandler<KeyEvent> {
+public class Game extends Application {
 
     private Group group;
 
@@ -40,7 +38,26 @@ public class Game extends Application implements EventHandler<KeyEvent> {
         group = new Group();
         drawGameObjects();
 
-        primaryStage.setScene(new Scene(group, width, height, Color.CADETBLUE));
+        Scene scene = new Scene(group, width, height, Color.CADETBLUE);
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case LEFT:
+                    cannon.moveTo(cannon.getXPos() - 10, terrain.heightFromWidth(cannon.getXPos() - 10));
+                    break;
+                case RIGHT:
+                    cannon.moveTo(cannon.getXPos() + 10, terrain.heightFromWidth(cannon.getXPos() + 10));
+                    break;
+                case UP:
+                    cannon.changeAngle(Math.PI / 12);
+                    break;
+                case DOWN:
+                    cannon.changeAngle(-Math.PI / 12);
+                    break;
+                case ENTER:
+                    break;
+            }
+        });
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -83,25 +100,5 @@ public class Game extends Application implements EventHandler<KeyEvent> {
         yPoints[10] = height;
 
         return new Terrain(xPoints, yPoints);
-    }
-
-    @Override
-    public void handle(KeyEvent event) {
-        switch (event.getCode()) {
-            case A:
-                cannon.moveTo(cannon.getXPos() - 40, terrain.heightFromWidth(cannon.getXPos() - 40));
-                break;
-            case D:
-                cannon.moveTo(cannon.getXPos() + 40, terrain.heightFromWidth(cannon.getXPos() + 40));
-                break;
-            case W:
-                cannon.changeAngle(Math.PI / 12);
-                break;
-            case S:
-                cannon.changeAngle(-Math.PI / 12);
-                break;
-            case ENTER:
-                break;
-        }
     }
 }
