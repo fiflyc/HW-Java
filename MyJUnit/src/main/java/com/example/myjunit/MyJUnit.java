@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,6 +58,7 @@ public class MyJUnit {
             var beforeEach = new ArrayList<Method>();
             var afterEach = new ArrayList<Method>();
             var testes = new ArrayList<Method>();
+            var ignored = new HashSet<Method>();
 
             for (var method: cl.getMethods()) {
                 for (var annotation: method.getDeclaredAnnotations()) {
@@ -75,13 +77,17 @@ public class MyJUnit {
                     } else if (annotation.getClass().equals(Test.class)) {
                         testes.add(method);
                         break;
+                    } else if (annotation.getClass().equals(Ignore.class)) {
+                        System.out.println("Ignore test " + method.getName() + ": " + annotation.toString());
+                        ignored.add(method);
+                        break;
                     }
                 }
             }
 
-            executeTestes(beforeAll, null, null);
-            executeTestes(testes, beforeEach, afterEach);
-            executeTestes(afterAll, null, null);
+            executeTestes(beforeAll, null, null, ignored);
+            executeTestes(testes, beforeEach, afterEach, ignored);
+            executeTestes(afterAll, null, null, ignored);
         } catch (MalformedURLException e) {
             System.out.println("Failed while creating class loader");
         } catch (ClassNotFoundException e) {
@@ -95,19 +101,27 @@ public class MyJUnit {
      * @param testes testes for executing
      * @param beforeEach testes executing before each testes
      * @param afterEach testes executing after each testes
+     * @param ignored testes what would been ignored
      */
-    private static void executeTestes(ArrayList<Method> testes, ArrayList<Method> beforeEach, ArrayList<Method> afterEach) {
+    private static void executeTestes(ArrayList<Method> testes, ArrayList<Method> beforeEach,
+                                      ArrayList<Method> afterEach, HashSet<Method> ignored) {
         var latch = new CountDownLatch(testes.size());
 
         for (var test: testes) {
             threadPool.submit(() -> {
                 try {
                     for (var before: beforeEach) {
-                        before.invoke(new Object[] {});
+                        if (!ignored.contains(before)) {
+                            before.invoke(new Object[] {});
+                        }
                     }
-                    test.invoke(new Object[] {});
+                    if (!ignored.contains(test)) {
+                        test.invoke(new Object[]{});
+                    }
                     for (var after: afterEach) {
-                        after.invoke(new Object[] {});
+                        if (!ignored.contains(after)) {
+                            after.invoke(new Object[] {});
+                        }
                     }
                 } catch (IllegalAccessException e) {
                     System.out.println("Illegal access for the test " + test.getName());
