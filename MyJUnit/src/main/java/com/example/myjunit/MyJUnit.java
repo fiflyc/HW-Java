@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyJUnit {
 
@@ -26,19 +27,26 @@ public class MyJUnit {
             return;
         }
 
+        int passed = 0;
         threadPool = Executors.newFixedThreadPool(30);
         File dir = new File(args[0]);
         if (dir.isFile()) {
             runTestsFromFile(dir);
         } else {
             for (var file: dir.listFiles()) {
-                runTestsFromFile(file);
+                passed += runTestsFromFile(file);
             }
         }
+
+        System.out.println(passed + " testes passed");
     }
 
-    /** Run testes from file. */
-    public static void runTestsFromFile(File file) {
+    /**
+     * Run testes from file.
+     * @return number of successful testes
+     * */
+    public static int runTestsFromFile(File file) {
+        int result = 0;
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(30);
         }
@@ -85,14 +93,16 @@ public class MyJUnit {
                 }
             }
 
-            executeTestes(beforeAll, null, null, ignored);
-            executeTestes(testes, beforeEach, afterEach, ignored);
-            executeTestes(afterAll, null, null, ignored);
+            result += executeTestes(beforeAll, null, null, ignored);
+            result += executeTestes(testes, beforeEach, afterEach, ignored);
+            result += executeTestes(afterAll, null, null, ignored);
         } catch (MalformedURLException e) {
             System.out.println("Failed while creating class loader");
         } catch (ClassNotFoundException e) {
             System.out.println("Failed while loading class from file " + file.getAbsolutePath());
         }
+
+        return result;
     }
 
     /**
@@ -102,10 +112,12 @@ public class MyJUnit {
      * @param beforeEach testes executing before each testes
      * @param afterEach testes executing after each testes
      * @param ignored testes what would been ignored
+     * @return number of successful testes
      */
-    private static void executeTestes(ArrayList<Method> testes, ArrayList<Method> beforeEach,
+    private static int executeTestes(ArrayList<Method> testes, ArrayList<Method> beforeEach,
                                       ArrayList<Method> afterEach, HashSet<Method> ignored) {
         var latch = new CountDownLatch(testes.size());
+        AtomicInteger result = new AtomicInteger();
 
         for (var test: testes) {
             threadPool.submit(() -> {
@@ -117,6 +129,7 @@ public class MyJUnit {
                     }
                     if (!ignored.contains(test)) {
                         test.invoke(new Object[]{});
+                        result.getAndIncrement();
                     }
                     for (var after: afterEach) {
                         if (!ignored.contains(after)) {
@@ -138,5 +151,7 @@ public class MyJUnit {
         } catch (InterruptedException e) {
             /* Do nothing. */
         }
+
+        return result.get();
     }
 }
