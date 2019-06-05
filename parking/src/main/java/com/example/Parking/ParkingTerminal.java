@@ -20,7 +20,7 @@ public class ParkingTerminal {
     }
 
     boolean driveIn() {
-        AtomicBoolean result = new AtomicBoolean(false);
+        var result = new AtomicBoolean(false);
         free.updateAndGet(x -> {
            if (x > 0) {
                result.set(true);
