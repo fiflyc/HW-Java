@@ -1,4 +1,4 @@
-package com.example.parking;
+package com.example.Parking;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +15,7 @@ public class ParkingTerminal {
      * @param places maximum of free places
      */
     ParkingTerminal(int places) {
-        free = new AtomicInteger(0);
+        free = new AtomicInteger(places);
         max = new AtomicInteger(places);
     }
 

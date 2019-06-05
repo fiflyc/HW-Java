@@ -1,6 +1,7 @@
-package com.example.parking;
+package com.example.Parking;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,7 @@ class ParkingTerminalTest {
         var threads = new ArrayList<Thread>();
         for (int i = 0; i < MAX * 2; i++) {
             threads.add(new Thread(() -> {
-                parking.driveOut();
+                parking.driveIn();
             }));
             threads.get(i).start();
         }
